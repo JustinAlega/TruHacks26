@@ -54,9 +54,9 @@ def get_courses() -> list[dict]:
 def get_late_stats(course_id: int) -> dict:
     """
     Fetch all assignments for a course (with submission data) and count
-    how many were submitted late.
+    how many were submitted late or are missing.
 
-    Returns dict with total_assignments, late_assignments, and on_time.
+    Returns dict with total_assignments, late_assignments, missing_assignments, and on_time.
     """
     assignments = []
     url = f"{BASE_URL}/courses/{course_id}/assignments"
@@ -78,19 +78,25 @@ def get_late_stats(course_id: int) -> dict:
                 url = part.split(";")[0].strip().strip("<>")
                 break
 
-    # Count late submissions
+    # Count late and missing submissions
     total = len(assignments)
     late = 0
+    missing = 0
     for assignment in assignments:
         submission = assignment.get("submission", {})
-        if submission and submission.get("late"):
-            late += 1
+        if submission:
+            if submission.get("late"):
+                late += 1
+            if submission.get("missing"):
+                missing += 1
 
     return {
         "total_assignments": total,
         "late_assignments": late,
-        "on_time": total - late,
+        "missing_assignments": missing,
+        "on_time": total - late - missing,
         "late_fraction": f"{late}/{total}" if total > 0 else "0/0",
+        "missing_fraction": f"{missing}/{total}" if total > 0 else "0/0",
     }
 
 
@@ -126,6 +132,8 @@ def extract_grades(course: dict, late_stats: dict) -> dict:
         "total_assignments": late_stats.get("total_assignments", 0),
         "late_assignments": late_stats.get("late_assignments", 0),
         "late_fraction": late_stats.get("late_fraction", "0/0"),
+        "missing_assignments": late_stats.get("missing_assignments", 0),
+        "missing_fraction": late_stats.get("missing_fraction", "0/0"),
     }
 
 
@@ -139,9 +147,9 @@ def print_results(records: list[dict]) -> None:
         print(f"  Course Code   : {rec['course_code']}")
         print(f"  Current Score : {rec['current_score'] or 'N/A'}")
         print(f"  Current Grade : {rec['current_grade'] or 'N/A'}")
-        print(f"  Final Score   : {rec['final_score'] or 'N/A'}")
         print(f"  Final Grade   : {rec['final_grade'] or 'N/A'}")
         print(f"  Late Work     : {rec['late_fraction']} assignments late")
+        print(f"  Missing Work  : {rec['missing_fraction']} assignments missing")
     print(f"\n{'=' * 60}")
     print(f"  Total courses: {len(records)}")
     print(f"{'=' * 60}\n")
