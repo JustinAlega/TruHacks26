@@ -1,0 +1,35 @@
+.stree { display: flex; flex-direction: column; gap: var(--sp-2); }
+
+.srow { padding: var(--sp-1) 0; }
+
+.srow__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.srow__name {
+  font-size: var(--fs-body-sm);
+  font-weight: 500;
+  color: var(--on-surface);
+}
+
+.srow__pct {
+  font-size: var(--fs-label-sm);
+  font-weight: 600;
+  color: var(--outline);
+}
+
+.srow__track {
+  height: 6px;
+  border-radius: var(--r-full);
+  background: var(--surface-container-highest);
+  overflow: hidden;
+}
+
+.srow__fill {
+  height: 100%;
+  border-radius: var(--r-full);
+  transition: width var(--dur-slow) var(--ease);
+}

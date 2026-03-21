@@ -1,0 +1,81 @@
+.cbody { display: flex; flex-direction: column; gap: var(--sp-3); }
+
+/* §6 DON'T standard blue links — secondary teal for action */
+.cbody__code {
+  font-size: var(--fs-label-md);
+  font-weight: 700;
+  color: var(--secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* §3 Manrope headline */
+.cbody__name {
+  font-family: var(--font-display);
+  font-size: var(--fs-title-md);
+  font-weight: 700;
+  margin-top: calc(-1 * var(--sp-1));
+}
+
+.cbody__dl {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+/* §4 Tonal Layering — surface-container-low on white card = nested depth */
+.cbody__dl-row {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--r-md);
+  background: var(--surface-container-low);
+}
+
+.cbody__dl-row dt {
+  font-size: var(--fs-label-sm);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--outline);
+}
+.cbody__dl-row dd {
+  font-size: var(--fs-body-sm);
+  font-weight: 500;
+  text-align: right;
+}
+
+/* §5 Tertiary accent for premium / highlighted data */
+.cbody__accent { color: var(--tertiary); font-weight: 700; }
+
+.cbody__desc {
+  font-size: var(--fs-body-sm);
+  line-height: 1.6;
+  color: var(--on-surface-variant);
+}
+
+.cbody__prereq {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+.cbody__prereq-label {
+  font-size: var(--fs-label-sm);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--outline);
+}
+.cbody__prereq-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+.cbody__prereq-list li {
+  font-size: var(--fs-label-md);
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--r-md);
+  background: var(--surface-container-highest);
+  color: var(--on-surface-variant);
+}

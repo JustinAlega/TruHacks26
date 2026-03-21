@@ -1,0 +1,37 @@
+.dock {
+  position: fixed;
+  top: var(--sp-4);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 45;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--sp-2);
+  max-width: min(96vw, 600px);
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--r-xl);
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: var(--shadow-md), 0 0 0 1px var(--glass-border);
+  pointer-events: auto;
+}
+
+.dock__chip {
+  padding: var(--sp-2) var(--sp-4);
+  border-radius: var(--r-lg);
+  font-size: var(--fs-label-md);
+  font-weight: 600;
+  color: var(--secondary-fixed-dim);
+  background: rgba(0, 106, 106, 0.08);
+  transition: background var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+}
+.dock__chip:hover {
+  background: rgba(0, 106, 106, 0.15);
+  transform: translateY(-1px);
+}
+.dock__chip:focus-visible {
+  outline: 2px solid rgba(0, 106, 106, 0.25);
+  outline-offset: 2px;
+}

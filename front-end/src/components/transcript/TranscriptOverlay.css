@@ -1,0 +1,95 @@
+.transcript {
+  position: fixed;
+  bottom: 140px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 55;
+  width: min(640px, 90vw);
+  max-height: 200px;
+  overflow-y: auto;
+  pointer-events: none;
+  mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 100%);
+}
+
+.transcript__inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+}
+
+.transcript__line {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-lg);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  box-shadow: 0 0 0 1px var(--glass-border);
+  animation: transcript-in var(--dur-slow) var(--ease);
+  pointer-events: auto;
+  transition: opacity 1.5s ease-out;
+}
+
+.transcript__line--fade {
+  opacity: 0.3;
+}
+
+.transcript__line--user {
+  align-self: flex-end;
+  max-width: 80%;
+}
+
+.transcript__line--assistant {
+  align-self: flex-start;
+  max-width: 90%;
+}
+
+.transcript__role {
+  font-family: var(--font-display);
+  font-size: var(--fs-label-sm);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--secondary-fixed-dim);
+}
+
+.transcript__line--user .transcript__role {
+  color: var(--inverse-primary);
+}
+
+.transcript__text {
+  font-size: var(--fs-body-md);
+  line-height: 1.6;
+  color: var(--on-surface);
+}
+
+.transcript__cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background: var(--secondary);
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  animation: cursor-blink 0.8s steps(2) infinite;
+}
+
+@keyframes transcript-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@media (max-width: 768px) {
+  .transcript {
+    bottom: 120px;
+    width: 95vw;
+  }
+}

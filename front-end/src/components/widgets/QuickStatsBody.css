@@ -1,0 +1,51 @@
+.qstats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.qstats__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-2);
+}
+
+.qstats__tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: var(--sp-3) var(--sp-2);
+  border-radius: var(--r-lg);
+  background: var(--surface-container-low);
+}
+
+.qstats__tile--gpa {
+  background: rgba(0, 106, 106, 0.08);
+}
+
+.qstats__value {
+  font-family: var(--font-display);
+  font-size: var(--fs-headline-sm);
+  font-weight: 800;
+  color: var(--on-surface);
+}
+
+.qstats__tile--gpa .qstats__value {
+  color: var(--secondary-fixed-dim);
+}
+
+.qstats__label {
+  font-size: var(--fs-label-sm);
+  font-weight: 600;
+  color: var(--outline);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.qstats__semester {
+  text-align: center;
+  font-size: var(--fs-label-md);
+  color: var(--outline);
+  font-weight: 500;
+}

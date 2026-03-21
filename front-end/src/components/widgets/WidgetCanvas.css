@@ -1,0 +1,34 @@
+.wc {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 40;
+  overflow: hidden;
+}
+
+.wc__slot {
+  position: absolute;
+  left: 0;
+  top: 0;
+  pointer-events: auto;
+}
+
+.wc--mobile {
+  position: fixed;
+  inset: auto 0 160px 0;
+  height: auto;
+  max-height: 50vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3);
+  pointer-events: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.wc__mobile-slot {
+  pointer-events: auto;
+  width: min(92vw, 400px);
+}

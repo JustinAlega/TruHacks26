@@ -1,0 +1,82 @@
+.chat-input-bar {
+  position: fixed;
+  bottom: 140px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 58;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  width: min(500px, 88vw);
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--r-xl);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  box-shadow: var(--shadow-lg), 0 0 0 1px var(--glass-border);
+  animation: input-bar-in var(--dur-slow) var(--ease);
+}
+
+.chat-input-bar__field {
+  flex: 1;
+  background: transparent;
+  font-size: var(--fs-body-md);
+  color: var(--on-surface);
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--r-lg);
+}
+.chat-input-bar__field::placeholder {
+  color: var(--outline);
+}
+.chat-input-bar__field:focus {
+  box-shadow: none;
+}
+
+.chat-input-bar__send {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--r-full);
+  background: var(--secondary);
+  color: var(--on-secondary);
+  display: grid;
+  place-items: center;
+  transition: opacity var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+}
+.chat-input-bar__send:disabled { opacity: 0.3; }
+.chat-input-bar__send:hover:not(:disabled) { transform: scale(1.06); }
+
+.chat-hint {
+  position: fixed;
+  bottom: 150px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 55;
+  font-size: var(--fs-label-sm);
+  color: var(--outline);
+  padding: var(--sp-1) var(--sp-3);
+  border-radius: var(--r-full);
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.chat-hint kbd {
+  font-family: var(--font-display);
+  font-size: var(--fs-label-sm);
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--surface-container-highest);
+  color: var(--on-surface);
+}
+
+@keyframes input-bar-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(8px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}

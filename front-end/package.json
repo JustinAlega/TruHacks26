@@ -12,8 +12,12 @@
   "dependencies": {
     "@elevenlabs/elevenlabs-js": "^2.39.0",
     "@elevenlabs/react": "^0.14.3",
+    "@xyflow/react": "^12.10.1",
     "react": "^19.2.4",
-    "react-dom": "^19.2.4"
+    "react-dom": "^19.2.4",
+    "react-draggable": "^4.5.0",
+    "react-router-dom": "^7.13.1",
+    "zustand": "^5.0.12"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",

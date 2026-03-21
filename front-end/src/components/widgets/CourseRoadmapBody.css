@@ -1,0 +1,43 @@
+.roadmap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.roadmap__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.roadmap__tag {
+  font-size: var(--fs-label-sm);
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: var(--r-full);
+}
+
+.roadmap__tag--completed   { background: rgba(0, 106, 106, 0.15); color: var(--secondary-fixed-dim); }
+.roadmap__tag--in_progress { background: rgba(0, 25, 68, 0.2);    color: var(--inverse-primary); }
+.roadmap__tag--available   { background: rgba(255, 255, 255, 0.06); color: var(--outline); }
+.roadmap__tag--locked      { background: rgba(255, 255, 255, 0.02); color: var(--outline-variant); }
+
+.roadmap__graph {
+  height: 340px;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.roadmap__graph .react-flow__background {
+  background: transparent !important;
+}
+
+.roadmap__graph .react-flow__node {
+  cursor: default;
+}
+
+.roadmap__graph .react-flow__minimap,
+.roadmap__graph .react-flow__controls {
+  display: none;
+}

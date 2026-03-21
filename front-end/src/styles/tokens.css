@@ -1,0 +1,133 @@
+/* ═══════════════════════════════════════════════════════════════
+   Design Tokens — "The Luminescent Scholar"
+   Based on DESIGN.md §2–§6
+   ═══════════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  /* ── Primary (Deep Blue) ─────────────────────────────── */
+  --primary:                  #001944;
+  --primary-container:        #002c6e;
+  --on-primary:               #ffffff;
+  --on-primary-container:     #d6e3ff;
+  --inverse-primary:          #adc6ff;
+
+  /* ── Secondary (Teal) ────────────────────────────────── */
+  --secondary:                #006a6a;
+  --secondary-container:      #004f50;
+  --on-secondary:             #ffffff;
+  --secondary-fixed:          #93f2f2;
+  --secondary-fixed-dim:      #4dd9da;
+
+  /* ── Tertiary (Amber) ────────────────────────────────── */
+  --tertiary:                 #7b5800;
+  --tertiary-container:       #614500;
+  --tertiary-fixed:           #ffdea2;
+  --tertiary-fixed-dim:       #dec48c;
+
+  /* ── Error ───────────────────────────────────────────── */
+  --error:                    #ba1a1a;
+  --error-container:          #ffdad6;
+
+  /* ── Surface hierarchy (§2 — "No-Line" Rule) ─────────── */
+  --background:               #f7f9fc;
+  --surface:                  #f7f9fc;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low:    #f2f4f7;
+  --surface-container:        #eceef1;
+  --surface-container-high:   #e6e8eb;
+  --surface-container-highest:#e0e3e6;
+
+  --on-surface:               #191c1e;
+  --on-surface-variant:       #43474b;
+  --outline:                  #73777c;
+  --outline-variant:          #c3c7cc;
+
+  /* ── Glass & gradient (§2, §4) ───────────────────────── */
+  --glass-bg:                 rgba(247, 249, 252, 0.72);
+  --glass-border:             rgba(195, 199, 204, 0.18);
+  --glass-blur:               24px;
+
+  /* ── Shadows (§4 — never pure black) ─────────────────── */
+  --shadow-sm:  0 1px 3px rgba(25, 28, 30, 0.04);
+  --shadow-md:  0 4px 12px rgba(25, 28, 30, 0.06);
+  --shadow-lg:  0 12px 32px rgba(25, 28, 30, 0.08);
+  --shadow-xl:  0 20px 50px rgba(25, 28, 30, 0.10);
+  --shadow-orb: 0 8px 30px rgba(0, 106, 106, 0.18), 0 2px 8px rgba(25, 28, 30, 0.06);
+
+  /* ── Typography (§3) ─────────────────────────────────── */
+  --font-display:   'Manrope', system-ui, sans-serif;
+  --font-body:      'Inter', system-ui, sans-serif;
+
+  --fs-display-lg:  3rem;       /* 48px */
+  --fs-display-sm:  2.25rem;    /* 36px */
+  --fs-headline-lg: 1.75rem;    /* 28px */
+  --fs-headline-sm: 1.25rem;    /* 20px */
+  --fs-title-lg:    1.125rem;   /* 18px */
+  --fs-title-md:    1rem;       /* 16px */
+  --fs-title-sm:    0.875rem;   /* 14px */
+  --fs-body-lg:     1rem;       /* 16px */
+  --fs-body-md:     0.875rem;   /* 14px */
+  --fs-body-sm:     0.8125rem;  /* 13px */
+  --fs-label-lg:    0.875rem;   /* 14px */
+  --fs-label-md:    0.75rem;    /* 12px */
+  --fs-label-sm:    0.6875rem;  /* 11px */
+
+  /* ── Spacing ─────────────────────────────────────────── */
+  --sp-1:  0.25rem;   /* 4px  */
+  --sp-2:  0.5rem;    /* 8px  */
+  --sp-3:  0.75rem;   /* 12px */
+  --sp-4:  1rem;      /* 16px */
+  --sp-5:  1.25rem;   /* 20px */
+  --sp-6:  1.5rem;    /* 24px */
+  --sp-8:  2rem;      /* 32px */
+  --sp-10: 2.5rem;    /* 40px */
+  --sp-12: 3rem;      /* 48px */
+  --sp-16: 4rem;      /* 64px */
+  --sp-20: 5rem;      /* 80px */
+  --sp-24: 6rem;      /* 96px */
+
+  /* ── Radii ───────────────────────────────────────────── */
+  --r-sm:   0.375rem;   /* 6px  */
+  --r-md:   0.75rem;    /* 12px */
+  --r-lg:   1rem;       /* 16px */
+  --r-xl:   1.25rem;    /* 20px */
+  --r-2xl:  1.5rem;     /* 24px */
+  --r-full: 9999px;
+
+  /* ── Transitions ─────────────────────────────────────── */
+  --ease:      cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-fast:  120ms;
+  --dur-norm:  200ms;
+  --dur-slow:  350ms;
+  --dur-enter: 500ms;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Dark mode — JARVIS canvas
+   Deep blues and elevated glass
+   ═══════════════════════════════════════════════════════════════ */
+html.theme-dark, [data-theme="dark"], .theme-dark {
+  --background:               #0a0e17;
+  --surface:                  #0f1420;
+  --surface-container-lowest: #060a12;
+  --surface-container-low:    #121826;
+  --surface-container:        #181f2e;
+  --surface-container-high:   #1f2738;
+  --surface-container-highest:#272f42;
+
+  --on-surface:               #e2e6ed;
+  --on-surface-variant:       #a0a8b8;
+  --outline:                  #6b7588;
+  --outline-variant:          #3a4358;
+
+  --glass-bg:                 rgba(15, 20, 32, 0.78);
+  --glass-border:             rgba(100, 120, 160, 0.12);
+
+  --shadow-sm:  0 1px 3px rgba(0, 0, 0, 0.20);
+  --shadow-md:  0 4px 12px rgba(0, 0, 0, 0.30);
+  --shadow-lg:  0 12px 32px rgba(0, 0, 0, 0.35);
+  --shadow-xl:  0 20px 50px rgba(0, 0, 0, 0.40);
+  --shadow-orb: 0 8px 30px rgba(0, 106, 106, 0.25), 0 2px 8px rgba(0, 0, 0, 0.20);
+}

@@ -1,0 +1,69 @@
+.bubble {
+  display: flex;
+  gap: var(--sp-3);
+  max-width: min(85%, 640px);
+  animation: bubble-in var(--dur-norm) var(--ease);
+}
+
+.bubble--user {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+.bubble--ai {
+  align-self: flex-start;
+}
+
+/* §5 Orb gradient re-used as avatar accent */
+.bubble__avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--r-full);
+  background: linear-gradient(135deg, var(--secondary), var(--secondary-fixed-dim));
+  display: grid;
+  place-items: center;
+  color: var(--on-secondary);
+  flex-shrink: 0;
+  margin-top: var(--sp-1);
+}
+
+.bubble__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+
+/* §2 Signature Textures — user bubble uses primary gradient */
+.bubble--user .bubble__body {
+  background: linear-gradient(135deg, var(--primary), var(--primary-container));
+  color: var(--on-primary);
+  border-radius: var(--r-xl) var(--r-xl) var(--r-sm) var(--r-xl);
+  padding: var(--sp-3) var(--sp-4);
+}
+
+/* §4 Layering — surface-container-lowest on surface canvas = soft lift, no border */
+.bubble--ai .bubble__body {
+  background: var(--surface-container-lowest);
+  color: var(--on-surface);
+  border-radius: var(--r-xl) var(--r-xl) var(--r-xl) var(--r-sm);
+  padding: var(--sp-3) var(--sp-4);
+  box-shadow: var(--shadow-sm);
+}
+
+.bubble__text {
+  font-size: var(--fs-body-md);
+  line-height: 1.6;
+  color: inherit;
+  white-space: pre-wrap;
+}
+
+.bubble__time {
+  font-size: var(--fs-label-sm);
+  opacity: 0.5;
+  align-self: flex-end;
+}
+.bubble--user .bubble__time { color: var(--on-primary); }
+
+@keyframes bubble-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

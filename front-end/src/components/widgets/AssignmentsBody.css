@@ -1,0 +1,63 @@
+.asec { display: flex; flex-direction: column; gap: var(--sp-3); }
+
+.asec__label {
+  font-family: var(--font-display);
+  font-size: var(--fs-label-md);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--on-surface-variant);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+/* §6 DO — tertiary_fixed for urgent */
+.asec__label--urgent { color: var(--tertiary); }
+
+.asec__count {
+  padding: 2px 8px;
+  border-radius: var(--r-full);
+  background: var(--tertiary-fixed);
+  color: var(--tertiary);
+  font-size: var(--fs-label-sm);
+}
+
+.alist {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+/* §5 Interactive Lists — surface_container_low, hover→high, lg radius */
+.arow {
+  display: flex;
+  gap: var(--sp-3);
+  padding: var(--sp-3);
+  border-radius: var(--r-lg);
+  background: var(--surface-container-low);
+  transition: background var(--dur-fast) var(--ease);
+}
+.arow:hover { background: var(--surface-container-high); }
+
+.arow__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--r-full);
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+.arow--missing .arow__dot { background: var(--error); }
+.arow--upcoming .arow__dot { background: var(--secondary); }
+
+.arow__name {
+  font-size: var(--fs-body-sm);
+  font-weight: 600;
+  color: var(--on-surface);
+}
+.arow__meta {
+  font-size: var(--fs-label-sm);
+  color: var(--outline);
+  margin-top: 2px;
+}

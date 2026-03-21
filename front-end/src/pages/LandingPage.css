@@ -1,0 +1,134 @@
+.land {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--background);
+  position: relative;
+  overflow: hidden;
+}
+
+.land__wash {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 50% at 20% 10%, rgba(0, 106, 106, 0.08), transparent),
+    radial-gradient(ellipse 60% 45% at 85% 90%, rgba(0, 25, 68, 0.06), transparent);
+  pointer-events: none;
+}
+
+.land__grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(100, 140, 200, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(100, 140, 200, 0.06) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 60% 55% at 50% 50%, black 10%, transparent 65%);
+  -webkit-mask-image: radial-gradient(ellipse 60% 55% at 50% 50%, black 10%, transparent 65%);
+  pointer-events: none;
+}
+
+.land__inner {
+  position: relative;
+  z-index: 1;
+  width: min(440px, 92vw);
+  padding: var(--sp-8) 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.land__orb {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--r-full);
+  background: radial-gradient(circle at 35% 35%, var(--secondary-fixed), var(--secondary));
+  box-shadow: var(--shadow-orb);
+  margin-bottom: var(--sp-6);
+  animation: land-bob 4s ease-in-out infinite;
+}
+@keyframes land-bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+
+.land__title {
+  font-family: var(--font-display);
+  font-size: var(--fs-display-lg);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: var(--sp-1);
+  background: linear-gradient(135deg, var(--secondary-fixed), var(--inverse-primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.land__subtitle {
+  font-size: var(--fs-body-md);
+  font-weight: 600;
+  color: var(--outline);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: var(--sp-4);
+}
+
+.land__lede {
+  font-size: var(--fs-body-md);
+  color: var(--on-surface-variant);
+  line-height: 1.65;
+  margin-bottom: var(--sp-10);
+}
+
+.land__form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  text-align: left;
+}
+
+.land__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+
+.land__label {
+  font-size: var(--fs-label-md);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--on-surface-variant);
+}
+
+.land__input {
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-lg);
+  font-size: var(--fs-body-md);
+  color: var(--on-surface);
+  background: var(--surface-container-low);
+  transition: box-shadow var(--dur-fast) var(--ease);
+}
+.land__input::placeholder { color: var(--outline); }
+.land__input:focus { box-shadow: 0 0 0 2px rgba(0, 106, 106, 0.25); }
+
+.land__cta {
+  margin-top: var(--sp-2);
+  padding: var(--sp-3) var(--sp-6);
+  border-radius: var(--r-md);
+  background: linear-gradient(135deg, var(--secondary), var(--secondary-container));
+  color: var(--on-secondary);
+  font-weight: 600;
+  font-size: var(--fs-body-md);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  transition: opacity var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+}
+.land__cta:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md), 0 0 30px rgba(0, 106, 106, 0.15);
+}
+.land__cta:disabled { opacity: 0.4; cursor: default; }
+.land__cta:focus-visible { outline: 2px solid rgba(0, 106, 106, 0.3); outline-offset: 2px; }
