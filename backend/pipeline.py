@@ -85,9 +85,14 @@ class VoicePipeline:
         config = types.GenerateContentConfig(
             system_instruction=SYSTEM_INSTRUCTION,
             tools=ALL_TOOLS,
+            automatic_function_calling=types.AutomaticFunctionCallingConfig(
+                disable=True
+            ),
         )
 
         accumulated_text = ""
+        # (tool_name, args_dict, raw_result)
+        tool_results_log: list[tuple[str, dict, dict]] = []
 
         for _ in range(MAX_TOOL_ROUNDS):
             text, pending_tool_call = await self._stream_one_round(tts_ws, config)
@@ -107,7 +112,9 @@ class VoicePipeline:
             )
 
             # Execute tool and add result to history
+            args = dict(pending_tool_call.args) if pending_tool_call.args else {}
             tool_result = await self._execute_tool(pending_tool_call)
+            tool_results_log.append((pending_tool_call.name, args, tool_result))
             self.history.append(
                 types.Content(
                     role="user",
@@ -122,6 +129,11 @@ class VoicePipeline:
                 )
             )
             # Loop will call Gemini again with the tool result
+
+        # Send widget for the best tool result
+        widget_msg = await self._resolve_widget(tool_results_log)
+        if widget_msg:
+            await self.ws.send_json(widget_msg)
 
         return accumulated_text
 
@@ -202,6 +214,133 @@ class VoicePipeline:
         )
 
         return result
+
+    # ── Widget selection & formatting ────────────────────────────────────
+
+    async def _resolve_widget(
+        self, tool_results_log: list[tuple[str, dict, dict]]
+    ) -> dict | None:
+        """Pick which tool result to display as a frontend widget.
+
+        - No tool calls → None
+        - All calls to the same tool → format last result
+        - Multiple distinct tools → ask Gemini to pick, then format
+        """
+        if not tool_results_log:
+            return None
+
+        distinct_tools = {name for name, _, _ in tool_results_log}
+        if len(distinct_tools) == 1:
+            name, args, result = tool_results_log[-1]
+            return self._format_widget(name, args, result)
+
+        chosen_name, chosen_args, chosen_result = await self._pick_widget(
+            tool_results_log
+        )
+        return self._format_widget(chosen_name, chosen_args, chosen_result)
+
+    async def _pick_widget(
+        self, tool_results_log: list[tuple[str, dict, dict]]
+    ) -> tuple[str, dict, dict]:
+        """Ask Gemini which tool result is most relevant to display."""
+        last_per_tool: dict[str, tuple[dict, dict]] = {}
+        for name, args, data in tool_results_log:
+            last_per_tool[name] = (args, data)
+
+        tool_names = list(last_per_tool.keys())
+        prompt = (
+            "The user asked a question and the following tools were called:\n"
+        )
+        for name in tool_names:
+            prompt += f"- {name}\n"
+        prompt += (
+            "\nWhich ONE tool result is most important to display as a visual widget? "
+            "Reply with ONLY the tool name, nothing else."
+        )
+
+        response = await self.gemini.aio.models.generate_content(
+            model=GEMINI_MODEL,
+            contents=self.history + [
+                types.Content(role="user", parts=[types.Part(text=prompt)])
+            ],
+        )
+
+        chosen = response.text.strip() if response.text else ""
+
+        for name in tool_names:
+            if name in chosen:
+                args, data = last_per_tool[name]
+                return name, args, data
+
+        # Fallback: last tool result
+        return tool_results_log[-1]
+
+    def _format_widget(
+        self, tool_name: str, args: dict, result: dict
+    ) -> dict | None:
+        """Convert a tool result into a widget message matching the frontend schema."""
+        if tool_name == "search_job_listings":
+            return {
+                "type": "widget",
+                "widget_type": "job-listings",
+                "data": {
+                    "query": ", ".join(args.get("titles", []) or []),
+                    "listings": [
+                        {
+                            "id": str(i),
+                            "title": j.get("role", ""),
+                            "company": j.get("company", ""),
+                            "location": j.get("location", "Remote"),
+                            "salary": f"${j['salary_min']}–${j['salary_max']}"
+                            if j.get("salary_min")
+                            else None,
+                            "technologies": j.get("technologies", []) or [],
+                            "postedDate": j.get("posted_date", ""),
+                            "url": j.get("url"),
+                        }
+                        for i, j in enumerate(result.get("results", []))
+                    ],
+                },
+            }
+
+        if tool_name == "lookup_professor":
+            return {
+                "type": "widget",
+                "widget_type": "professor",
+                "data": {
+                    "name": f"{result.get('firstName', '')} {result.get('lastName', '')}".strip()
+                    or args.get("professor_name", ""),
+                    "department": result.get("department", ""),
+                    "rating": result.get("avgRating", 0),
+                    "difficulty": result.get("avgDifficulty", 0),
+                    "wouldTakeAgain": 0,
+                    "numRatings": result.get("numRatings", 0),
+                    "topTags": [],
+                },
+            }
+
+        if tool_name == "get_canvas_courses":
+            courses = result.get("results", [])
+            return {
+                "type": "widget",
+                "widget_type": "assignments",
+                "data": {
+                    "assignments": [
+                        {
+                            "id": str(i),
+                            "courseName": c.get("course_code", ""),
+                            "name": c.get("course_name", ""),
+                            "dueDate": "",
+                            "status": "upcoming",
+                            "pointsEarned": c.get("current_score"),
+                            "pointsPossible": 100,
+                        }
+                        for i, c in enumerate(courses)
+                    ],
+                },
+            }
+
+        return None
 
     # ── ElevenLabs TTS WebSocket ─────────────────────────────────────────
 
