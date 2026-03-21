@@ -16,6 +16,7 @@ function App() {
   const [assistantBuffer, setAssistantBuffer] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [wsConnected, setWsConnected] = useState(false);
+  const [sessionStarted, setSessionStarted] = useState(false);
 
   const wsRef = useRef<WebSocket | null>(null);
   const playerRef = useRef<StreamingAudioPlayer | null>(null);
@@ -114,31 +115,28 @@ function App() {
   const isListening =
     scribe.status === "connected" || scribe.status === "transcribing";
 
-  // ── Push-to-talk ──────────────────────────────────────────────────
+  // ── Start session (requires user gesture for mic + autoplay) ──────
 
-  const toggleListening = useCallback(async () => {
+  const startSession = useCallback(async () => {
     // Init audio player on user gesture to satisfy autoplay policy
     playerRef.current!.init();
 
-    if (isListening) {
-      scribe.disconnect();
-    } else {
-      try {
-        const resp = await fetch("/scribe-token");
-        const tokenData = await resp.json();
-        await scribe.connect({
-          token: tokenData.token,
-          microphone: {
-            echoCancellation: true,
-            noiseSuppression: true,
-            autoGainControl: true,
-          },
-        });
-      } catch (err) {
-        console.error("Failed to connect STT:", err);
-      }
+    try {
+      const resp = await fetch("/scribe-token");
+      const tokenData = await resp.json();
+      await scribe.connect({
+        token: tokenData.token,
+        microphone: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        },
+      });
+      setSessionStarted(true);
+    } catch (err) {
+      console.error("Failed to start session:", err);
     }
-  }, [isListening, scribe]);
+  }, [scribe]);
 
   // ── Render ────────────────────────────────────────────────────────
 
@@ -189,13 +187,16 @@ function App() {
       </div>
 
       <div className="controls">
-        <button
-          className={`mic-button ${isListening ? "listening" : ""}`}
-          onClick={toggleListening}
-        >
-          {isListening ? "Listening..." : "Push to Talk"}
-        </button>
-        {isProcessing && <span className="processing">Thinking...</span>}
+        {!sessionStarted ? (
+          <button className="mic-button" onClick={startSession}>
+            Start Talking
+          </button>
+        ) : (
+          <div className="mic-status">
+            <span className={`dot ${isListening ? "green pulse" : "red"}`} />
+            {isProcessing ? "Thinking..." : isListening ? "Listening" : "Ready"}
+          </div>
+        )}
       </div>
     </div>
   );
