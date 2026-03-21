@@ -1,0 +1,72 @@
+[
+  {
+    "course_id": 14453547,
+    "course_name": " STAT 290 - Statistics",
+    "course_code": " 290",
+    "current_score": null,
+    "current_grade": null,
+    "final_score": 0.0,
+    "final_grade": null,
+    "total_assignments": 2,
+    "late_assignments": 1,
+    "late_fraction": "1/2",
+    "missing_assignments": 1,
+    "missing_fraction": "1/2"
+  },
+  {
+    "course_id": 14453655,
+    "course_name": "CS 260 - Object-Oriented Programming and Design",
+    "course_code": "260",
+    "current_score": null,
+    "current_grade": null,
+    "final_score": 0.0,
+    "final_grade": null,
+    "total_assignments": 1,
+    "late_assignments": 0,
+    "late_fraction": "0/1",
+    "missing_assignments": 0,
+    "missing_fraction": "0/1"
+  },
+  {
+    "course_id": 14453643,
+    "course_name": "CS 310 - Data Structures and Algorithms",
+    "course_code": "310",
+    "current_score": null,
+    "current_grade": null,
+    "final_score": 0.0,
+    "final_grade": null,
+    "total_assignments": 2,
+    "late_assignments": 1,
+    "late_fraction": "1/2",
+    "missing_assignments": 1,
+    "missing_fraction": "1/2"
+  },
+  {
+    "course_id": 14453599,
+    "course_name": "MATH 263 - Analytic Geometry and Calculus II",
+    "course_code": "263",
+    "current_score": null,
+    "current_grade": null,
+    "final_score": 0.0,
+    "final_grade": null,
+    "total_assignments": 1,
+    "late_assignments": 0,
+    "late_fraction": "0/1",
+    "missing_assignments": 0,
+    "missing_fraction": "0/1"
+  },
+  {
+    "course_id": 14452959,
+    "course_name": "test",
+    "course_code": "test",
+    "current_score": 100.0,
+    "current_grade": null,
+    "final_score": 100.0,
+    "final_grade": null,
+    "total_assignments": 1,
+    "late_assignments": 0,
+    "late_fraction": "0/1",
+    "missing_assignments": 0,
+    "missing_fraction": "0/1"
+  }
+]

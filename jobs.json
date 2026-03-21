@@ -1,0 +1,69 @@
+[
+  {
+    "role": "Simulation Software Engineer",
+    "url": "https://ch.linkedin.com/jobs/view/simulation-software-engineer-at-auterion-4386149080",
+    "technologies": [
+      "unreal-engine",
+      "docker",
+      "qemu",
+      "cplusplus",
+      "python",
+      "ubuntu"
+    ],
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": null,
+    "salary_string": null,
+    "industry": "Software Development",
+    "company": "Auterion",
+    "company_domain": "auterion.com",
+    "location": "Zurich",
+    "remote": false,
+    "seniority": "mid_level",
+    "description": "**Simulation Software Engineer**\n\n**Location:**\nZurich |\n**Company:**\nAuterion\n\n**The Mission**\n\nAt Auterion, we develop a state-of-the-art operating system for autonomous robotics, enabling a wide variety of platforms to execute missions in logistics, mapping, inspection, and reconnaissance. Our so..."
+  },
+  {
+    "role": "Senior Agentic Software Engineer",
+    "url": "https://www.linkedin.com/jobs/view/senior-agentic-software-engineer-at-siemens-digital-industries-software-4386141315",
+    "technologies": [
+      "langgraph",
+      "langchain",
+      "python"
+    ],
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": null,
+    "salary_string": null,
+    "industry": "Software Development",
+    "company": "Siemens Digital Industries Software",
+    "company_domain": "sw.siemens.com",
+    "location": "Wilsonville, OR",
+    "remote": false,
+    "seniority": "senior",
+    "description": "We are a leading global software company dedicated to the world of computer aided design, 3D modeling and simulation— helping innovative global manufacturers design better products, faster! With the resources of a large company, and the energy of a software start-up, we have fun together while creat..."
+  },
+  {
+    "role": "Python Software Engineer - Ai Training",
+    "url": "https://www.linkedin.com/jobs/view/python-software-engineer-ai-training-at-yo-it-consulting-4385797729",
+    "technologies": [
+      "python",
+      "mode",
+      "java",
+      "cplusplus",
+      "javascript",
+      "golang",
+      "rust"
+    ],
+    "salary_min": null,
+    "salary_max": null,
+    "salary_currency": null,
+    "salary_string": null,
+    "industry": null,
+    "company": "YO IT Consulting",
+    "company_domain": "yoitconsulting.com",
+    "location": "San Francisco, CA",
+    "remote": false,
+    "seniority": "mid_level",
+    "description": "**Work Mode:**\nRemote\n  \n  \n**Engagement Type:**\nIndependent Contractor\n  \n  \n**Schedule:**\nFull-Time or Part-Time Contract\n  \n  \n**Language Requirement:**\nFluent English\n  \n  \n**Role Overview**\nWe partner with leading AI teams to improve the quality, usefulness, and reliability of general-purpose c..."
+  }
+]
