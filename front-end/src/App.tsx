@@ -103,6 +103,16 @@ function App() {
               { role: 'tool', name: msg.name, data: msg.data },
             ]);
             break;
+          case 'widget':
+            if (msg.widget_type && msg.data) {
+              addWidget(
+                msg.widget_type as WidgetType,
+                msg.data,
+                msg.position,
+                msg.size ?? WIDGET_DEFAULT_SIZES[msg.widget_type as WidgetType],
+              );
+            }
+            break;
           case 'done':
             setAssistantBuffer((prev) => {
               if (prev.trim()) {
@@ -121,7 +131,8 @@ function App() {
 
     connect();
     return () => wsRef.current?.close();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [addWidget]);
 
   // ElevenLabs STT
   const scribe = useScribe({
