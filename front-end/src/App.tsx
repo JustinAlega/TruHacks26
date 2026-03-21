@@ -5,24 +5,24 @@ import { useWidgetManager } from './hooks/useWidgetManager';
 import { Widget } from './components/Widget';
 import { VoiceOrb } from './components/VoiceOrb';
 import { TranscriptPanel } from './components/TranscriptPanel';
-import { EXAMPLE_WIDGETS } from './exampleData';
+// import { EXAMPLE_WIDGETS } from './exampleData';
 import type { Message, WidgetType, WidgetInstance, Position, Size } from './types';
 import { WIDGET_DEFAULT_SIZES } from './types';
 import './App.css';
 
 const WS_URL = `ws://${window.location.host}/ws`;
 
-function buildInitialWidgets(): WidgetInstance[] {
-  return EXAMPLE_WIDGETS.map((ew, i) => ({
-    id: `example-${i}`,
-    type: ew.type,
-    data: ew.data,
-    position: ew.position,
-    size: ew.size,
-    zIndex: i + 1,
-    minimized: false,
-  }));
-}
+// function buildInitialWidgets(): WidgetInstance[] {
+//   return EXAMPLE_WIDGETS.map((ew, i) => ({
+//     id: `example-${i}`,
+//     type: ew.type,
+//     data: ew.data,
+//     position: ew.position,
+//     size: ew.size,
+//     zIndex: i + 1,
+//     minimized: false,
+//   }));
+// }
 
 declare global {
   interface Window {
@@ -53,7 +53,12 @@ function App() {
     updatePosition,
     bringToFront,
     toggleMinimize,
-  } = useWidgetManager(buildInitialWidgets());
+  } = useWidgetManager([]);
+
+  const addWidgetRef = useRef(addWidget);
+
+  // Keep ref in sync so WebSocket handler always has latest addWidget
+  addWidgetRef.current = addWidget;
 
   // Expose createWidget on window for external (WebSocket/AI) invocation
   useEffect(() => {
@@ -102,6 +107,10 @@ function App() {
               ...prev,
               { role: 'tool', name: msg.name, data: msg.data },
             ]);
+            break;
+          case 'widget':
+            console.log('[WIDGET] Received widget message:', msg.widget_type, msg.data);
+            addWidgetRef.current(msg.widget_type, msg.data, msg.position, msg.size);
             break;
           case 'done':
             setAssistantBuffer((prev) => {

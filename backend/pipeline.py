@@ -11,10 +11,13 @@ Handles a single WebSocket session's conversation loop:
 
 import asyncio
 import json
+import logging
 import os
 import re
 
 import websockets
+
+logger = logging.getLogger(__name__)
 from google import genai
 from google.genai import types
 
@@ -25,15 +28,25 @@ GEMINI_MODEL = "gemini-2.5-flash"
 VOICE_ID = "Xb7hH8MSUJpSbSDYk0k2"  # Alice — Clear, Engaging Educator
 TTS_MODEL = "eleven_flash_v2_5"
 
-SYSTEM_INSTRUCTION = """You are an AI Academic & Career Advisor named Aria. You help university students with:
-- Checking their current grades and courses on Canvas
-- Finding professor ratings on Rate My Professors
-- Discovering job listings matching their skills and interests
+SYSTEM_INSTRUCTION = """\
+You are Aria, a university academic and career advisor. You speak out loud.
 
-You have access to tools for each of these. Use them when the student asks about grades, professors, or jobs.
+CRITICAL — TOOL CALLING:
+When the student mentions grades, courses, professors, or jobs you MUST call the \
+matching tool BEFORE you produce ANY text response. Do NOT generate a response first. \
+Call the tool, wait for the result, THEN respond.
+- Grades or courses → call get_canvas_courses
+- Professor → call lookup_professor
+- Jobs or internships → call search_job_listings
+If you are unsure, call the tool anyway. NEVER guess or fabricate data.
 
-Keep your spoken responses concise and conversational — you're speaking out loud, not writing an essay.
-When reporting data from tools, summarize the key points rather than listing every field."""
+RESPONSE RULES:
+- 4 sentences max. No exceptions.
+- After a tool call, keep your spoken response brief — the student can see the data \
+in a widget on their screen.
+- No markdown, no bullet lists, no numbered lists.
+- Be opinionated, warm, and direct. Never say "as an AI."
+- You are Aria and you have opinions."""
 
 # Map function names to callables
 TOOL_MAP = {
@@ -56,6 +69,7 @@ class VoicePipeline:
 
     async def handle_message(self, text: str):
         """Process a user transcript: Gemini streaming -> TTS -> audio out."""
+        logger.info("[STT→LLM] User said: %s", text)
         self.history.append(
             types.Content(role="user", parts=[types.Part(text=text)])
         )
@@ -130,9 +144,15 @@ class VoicePipeline:
             )
             # Loop will call Gemini again with the tool result
 
+        logger.info(
+            "[LLM→TTS] Response complete, %d chars, %d tool calls",
+            len(accumulated_text), len(tool_results_log),
+        )
+
         # Send widget for the best tool result
         widget_msg = await self._resolve_widget(tool_results_log)
         if widget_msg:
+            logger.info("[WIDGET] Sending %s widget to frontend", widget_msg.get("widget_type"))
             await self.ws.send_json(widget_msg)
 
         return accumulated_text
@@ -154,7 +174,11 @@ class VoicePipeline:
             if not chunk.candidates:
                 continue
 
-            for part in chunk.candidates[0].content.parts:
+            parts = chunk.candidates[0].content.parts
+            if not parts:
+                continue
+
+            for part in parts:
                 if part.function_call:
                     # Flush buffered text before tool call
                     if text_buffer.strip():
@@ -192,6 +216,7 @@ class VoicePipeline:
         """Execute a Gemini function call and return the result."""
         name = function_call.name
         args = dict(function_call.args) if function_call.args else {}
+        logger.info("[TOOL] Calling %s with args: %s", name, args)
 
         await self.ws.send_json(
             {"type": "tool_call", "name": name, "args": args}
@@ -213,6 +238,7 @@ class VoicePipeline:
             {"type": "tool_result", "name": name, "data": result}
         )
 
+        logger.info("[TOOL] %s returned %d keys", name, len(result))
         return result
 
     # ── Widget selection & formatting ────────────────────────────────────
@@ -280,20 +306,24 @@ class VoicePipeline:
     ) -> dict | None:
         """Convert a tool result into a widget message matching the frontend schema."""
         if tool_name == "search_job_listings":
+            titles = args.get("titles") or []
+            query = ", ".join(titles) if titles else "Job Search"
             return {
                 "type": "widget",
                 "widget_type": "job-listings",
                 "data": {
-                    "query": ", ".join(args.get("titles", []) or []),
+                    "query": query,
                     "listings": [
                         {
                             "id": str(i),
                             "title": j.get("role", ""),
                             "company": j.get("company", ""),
                             "location": j.get("location", "Remote"),
-                            "salary": f"${j['salary_min']}–${j['salary_max']}"
-                            if j.get("salary_min")
-                            else None,
+                            "salary": (
+                                f"${j['salary_min']:,.0f}–${j['salary_max']:,.0f}"
+                                if j.get("salary_min") and j.get("salary_max")
+                                else None
+                            ),
                             "technologies": j.get("technologies", []) or [],
                             "postedDate": j.get("posted_date", ""),
                             "url": j.get("url"),
@@ -304,6 +334,8 @@ class VoicePipeline:
             }
 
         if tool_name == "lookup_professor":
+            if result.get("error"):
+                return None
             return {
                 "type": "widget",
                 "widget_type": "professor",
@@ -321,6 +353,8 @@ class VoicePipeline:
 
         if tool_name == "get_canvas_courses":
             courses = result.get("results", [])
+            if not courses:
+                return None
             return {
                 "type": "widget",
                 "widget_type": "assignments",
@@ -331,7 +365,7 @@ class VoicePipeline:
                             "courseName": c.get("course_code", ""),
                             "name": c.get("course_name", ""),
                             "dueDate": "",
-                            "status": "upcoming",
+                            "status": "graded",
                             "pointsEarned": c.get("current_score"),
                             "pointsPossible": 100,
                         }

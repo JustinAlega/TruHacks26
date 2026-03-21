@@ -4,7 +4,7 @@
 
 The frontend listens for a **`widget`** message type on the existing WebSocket connection (`/ws`). When the backend sends this message, the frontend automatically creates a draggable, glassmorphic widget popup on the user's canvas.
 
-The AI should send this message **after** executing a tool call, right before or alongside the conversational text response. This way the user sees the visual widget appear on their HUD while Aria speaks about the results.
+The backend sends this message **after all tool call rounds complete** (not per-tool-call). `_resolve_widget()` in `pipeline.py` picks the single best tool result to display, then `_format_widget()` transforms it to the widget schema. The widget appears on the HUD after Aria finishes speaking.
 
 ---
 
@@ -364,114 +364,60 @@ Default size: 540 × 400
 
 ---
 
-## Recommended Integration Pattern
+## Current Integration (pipeline.py)
 
-Here's the suggested flow in `pipeline.py` after a tool call resolves:
+Widget selection and formatting is implemented in `pipeline.py` with three methods:
 
-```python
-async def _execute_tool(self, function_call) -> dict:
-    name = function_call.name
-    args = dict(function_call.args) if function_call.args else {}
+### `_resolve_widget(tool_results_log)` — picks which result to display
+- No tool calls → `None`
+- All calls to the same tool → format the last result
+- Multiple distinct tools → asks Gemini to pick, then formats the chosen one
 
-    # Notify frontend a tool is being called
-    await self.ws.send_json({"type": "tool_call", "name": name, "args": args})
+### `_format_widget(tool_name, args, result)` — transforms scraper output to widget schema
 
-    # Execute the tool
-    fn = TOOL_MAP.get(name)
-    result = await asyncio.to_thread(fn, **args)
-    if isinstance(result, list):
-        result = {"results": result}
+**Field mappings from scraper output → widget schema:**
 
-    # Send raw result to transcript panel
-    await self.ws.send_json({"type": "tool_result", "name": name, "data": result})
+| Tool | Scraper field | Widget field |
+|------|--------------|--------------|
+| `search_job_listings` | `role` | `title` |
+| `search_job_listings` | `salary_min` + `salary_max` | `salary` (formatted as `$X–$Y`) |
+| `search_job_listings` | `posted_date` | `postedDate` |
+| `lookup_professor` | `firstName` + `lastName` | `name` |
+| `lookup_professor` | `avgRating` | `rating` |
+| `lookup_professor` | `avgDifficulty` | `difficulty` |
+| `get_canvas_courses` | `course_code` | `courseName` |
+| `get_canvas_courses` | `course_name` | `name` |
+| `get_canvas_courses` | `current_score` | `pointsEarned` |
 
-    # ── NEW: Send widget to the HUD canvas ──
-    widget_payload = self._format_widget(name, args, result)
-    if widget_payload:
-        await self.ws.send_json(widget_payload)
+### `_execute_tool(function_call)` — runs the tool and sends `tool_call` + `tool_result` messages
 
-    return result
-
-
-def _format_widget(self, tool_name: str, args: dict, result: dict) -> dict | None:
-    """Convert a tool result into a widget message, or None if no widget applies."""
-
-    if tool_name == "search_job_listings":
-        return {
-            "type": "widget",
-            "widget_type": "job-listings",
-            "data": {
-                "query": ", ".join(args.get("titles", [])),
-                "listings": [
-                    {
-                        "id": str(i),
-                        "title": j.get("title", ""),
-                        "company": j.get("company", ""),
-                        "location": j.get("location", "Remote"),
-                        "salary": j.get("salary"),
-                        "technologies": j.get("technologies", []),
-                        "postedDate": j.get("posted_date", ""),
-                        "url": j.get("url"),
-                    }
-                    for i, j in enumerate(result.get("results", []))
-                ],
-            },
-        }
-
-    if tool_name == "lookup_professor":
-        r = result
-        return {
-            "type": "widget",
-            "widget_type": "professor",
-            "data": {
-                "name": r.get("name", args.get("professor_name", "")),
-                "department": r.get("department", ""),
-                "rating": r.get("rating", 0),
-                "difficulty": r.get("difficulty", 0),
-                "wouldTakeAgain": r.get("would_take_again", 0),
-                "numRatings": r.get("num_ratings", 0),
-                "topTags": r.get("top_tags", []),
-            },
-        }
-
-    if tool_name == "get_canvas_courses":
-        # Could produce assignments and/or course-details widgets
-        # depending on what data is most relevant
-        return None  # Implement based on your Canvas response shape
-
-    return None
-```
+Widget message is sent once after all tool rounds complete (at the end of `_stream_with_tools`), not inside `_execute_tool`.
 
 ---
 
 ## Timing & Ordering
 
-The recommended message sequence for a single turn:
+Actual message sequence for a single turn with one tool call:
 
 ```
 1.  backend → frontend:  { "type": "tool_call", "name": "search_job_listings", "args": {...} }
 2.  backend → frontend:  { "type": "tool_result", "name": "search_job_listings", "data": {...} }
-3.  backend → frontend:  { "type": "widget", "widget_type": "job-listings", "data": {...} }
-4.  backend → frontend:  { "type": "text", "data": "I found some great internships..." }
-5.  backend → frontend:  { "type": "audio", "data": "<base64>" }
+3.  backend → frontend:  { "type": "text", "data": "I found some great..." }  // Gemini's 2nd pass
+4.  backend → frontend:  { "type": "audio", "data": "<base64>" }
     ... more text/audio chunks ...
+5.  backend → frontend:  { "type": "widget", "widget_type": "job-listings", "data": {...} }
 6.  backend → frontend:  { "type": "done" }
 ```
 
-Steps 1–3 happen before Gemini's second pass (where it narrates the results). Step 3 makes the widget appear on the canvas. Steps 4–5 are the AI talking about the results while the user already sees them visually.
+Steps 1–2 happen during tool execution. Steps 3–4 are Gemini narrating results + TTS audio (streamed in parallel). Step 5 is the widget, sent after all tool rounds and streaming complete. Step 6 signals the turn is done.
 
 ---
 
-## Sending Multiple Widgets
+## Widget Selection (Multiple Tool Calls)
 
-You can send multiple `widget` messages in a single turn. Each one creates an independent widget on the canvas. For example, if `get_canvas_courses` returns both course info and assignments, send two separate widget messages:
+When multiple distinct tools are called in one turn (e.g., grades + jobs), only **one** widget is sent. `_resolve_widget()` asks Gemini which tool result is most relevant, then formats that one. This keeps the canvas uncluttered.
 
-```python
-await self.ws.send_json({"type": "widget", "widget_type": "assignments", "data": {...}})
-await self.ws.send_json({"type": "widget", "widget_type": "course-details", "data": {...}})
-```
-
-They will each appear as their own draggable panel.
+If the same tool is called multiple times (e.g., two job searches), the last result is used.
 
 ---
 
