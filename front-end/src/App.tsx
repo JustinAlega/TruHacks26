@@ -1,22 +1,43 @@
-import { useState, useRef, useCallback, useEffect } from "react";
-import { useScribe, CommitStrategy } from "@elevenlabs/react";
-import { StreamingAudioPlayer } from "./audioPlayer";
-import "./App.css";
-
-type Message =
-  | { role: "user"; text: string }
-  | { role: "assistant"; text: string }
-  | { role: "tool"; name: string; data: unknown };
+import { useState, useRef, useCallback, useEffect } from 'react';
+import { useScribe, CommitStrategy } from '@elevenlabs/react';
+import { StreamingAudioPlayer } from './audioPlayer';
+import { useWidgetManager } from './hooks/useWidgetManager';
+import { Widget } from './components/Widget';
+import { VoiceOrb } from './components/VoiceOrb';
+import { TranscriptPanel } from './components/TranscriptPanel';
+import { EXAMPLE_WIDGETS } from './exampleData';
+import type { Message, WidgetType, WidgetInstance, Position, Size } from './types';
+import { WIDGET_DEFAULT_SIZES } from './types';
+import './App.css';
 
 const WS_URL = `ws://${window.location.host}/ws`;
 
+function buildInitialWidgets(): WidgetInstance[] {
+  return EXAMPLE_WIDGETS.map((ew, i) => ({
+    id: `example-${i}`,
+    type: ew.type,
+    data: ew.data,
+    position: ew.position,
+    size: ew.size,
+    zIndex: i + 1,
+    minimized: false,
+  }));
+}
+
+declare global {
+  interface Window {
+    createWidget: (type: WidgetType, data: unknown, position?: Position, size?: Size) => string;
+  }
+}
+
 function App() {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [partial, setPartial] = useState("");
-  const [assistantBuffer, setAssistantBuffer] = useState("");
+  const [partial, setPartial] = useState('');
+  const [assistantBuffer, setAssistantBuffer] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [wsConnected, setWsConnected] = useState(false);
   const [sessionStarted, setSessionStarted] = useState(false);
+  const [transcriptOpen, setTranscriptOpen] = useState(false);
 
   const wsRef = useRef<WebSocket | null>(null);
   const playerRef = useRef<StreamingAudioPlayer | null>(null);
@@ -25,8 +46,26 @@ function App() {
     playerRef.current = new StreamingAudioPlayer();
   }
 
-  // ── WebSocket to backend ──────────────────────────────────────────
+  const {
+    widgets,
+    addWidget,
+    removeWidget,
+    updatePosition,
+    bringToFront,
+    toggleMinimize,
+  } = useWidgetManager(buildInitialWidgets());
 
+  // Expose createWidget on window for external (WebSocket/AI) invocation
+  useEffect(() => {
+    window.createWidget = (type: WidgetType, data: unknown, position?: Position, size?: Size) => {
+      return addWidget(type, data, position, size ?? WIDGET_DEFAULT_SIZES[type]);
+    };
+    return () => {
+      delete (window as Record<string, unknown>).createWidget;
+    };
+  }, [addWidget]);
+
+  // WebSocket to backend
   useEffect(() => {
     const connect = () => {
       const ws = new WebSocket(WS_URL);
@@ -43,37 +82,36 @@ function App() {
         try {
           msg = JSON.parse(event.data);
         } catch {
-          console.warn("Invalid JSON from server:", event.data);
           return;
         }
 
         switch (msg.type) {
-          case "text":
+          case 'text':
             setAssistantBuffer((prev) => prev + msg.data);
             break;
-          case "audio":
+          case 'audio':
             playerRef.current!.playChunk(msg.data);
             break;
-          case "tool_call":
+          case 'tool_call':
             setAssistantBuffer(
-              (prev) => prev + `\n[Calling ${msg.name}...]\n`
+              (prev) => prev + `\n[Calling ${msg.name}...]\n`,
             );
             break;
-          case "tool_result":
+          case 'tool_result':
             setMessages((prev) => [
               ...prev,
-              { role: "tool", name: msg.name, data: msg.data },
+              { role: 'tool', name: msg.name, data: msg.data },
             ]);
             break;
-          case "done":
+          case 'done':
             setAssistantBuffer((prev) => {
               if (prev.trim()) {
                 setMessages((msgs) => [
                   ...msgs,
-                  { role: "assistant", text: prev },
+                  { role: 'assistant', text: prev },
                 ]);
               }
-              return "";
+              return '';
             });
             setIsProcessing(false);
             break;
@@ -85,10 +123,9 @@ function App() {
     return () => wsRef.current?.close();
   }, []);
 
-  // ── ElevenLabs STT (client-side) ─────────────────────────────────
-
+  // ElevenLabs STT
   const scribe = useScribe({
-    modelId: "scribe_v2_realtime",
+    modelId: 'scribe_v2_realtime',
     commitStrategy: CommitStrategy.VAD,
     onPartialTranscript: (data) => {
       setPartial(data.text);
@@ -97,32 +134,26 @@ function App() {
       const text = data.text.trim();
       if (!text) return;
 
-      setPartial("");
-      setMessages((prev) => [...prev, { role: "user", text }]);
-
-      // Stop any playing audio (user interrupted)
+      setPartial('');
+      setMessages((prev) => [...prev, { role: 'user', text }]);
       playerRef.current!.reset();
 
-      // Send to backend
       if (wsRef.current?.readyState === WebSocket.OPEN) {
         setIsProcessing(true);
-        setAssistantBuffer("");
-        wsRef.current.send(JSON.stringify({ type: "transcript", text }));
+        setAssistantBuffer('');
+        wsRef.current.send(JSON.stringify({ type: 'transcript', text }));
       }
     },
   });
 
   const isListening =
-    scribe.status === "connected" || scribe.status === "transcribing";
-
-  // ── Start session (requires user gesture for mic + autoplay) ──────
+    scribe.status === 'connected' || scribe.status === 'transcribing';
 
   const startSession = useCallback(async () => {
-    // Init audio player on user gesture to satisfy autoplay policy
     playerRef.current!.init();
 
     try {
-      const resp = await fetch("/scribe-token");
+      const resp = await fetch('/scribe-token');
       const tokenData = await resp.json();
       await scribe.connect({
         token: tokenData.token,
@@ -134,70 +165,47 @@ function App() {
       });
       setSessionStarted(true);
     } catch (err) {
-      console.error("Failed to start session:", err);
+      console.error('Failed to start session:', err);
     }
   }, [scribe]);
 
-  // ── Render ────────────────────────────────────────────────────────
-
   return (
-    <div className="app">
-      <header>
-        <h1>Aria</h1>
-        <p className="subtitle">AI Academic &amp; Career Advisor</p>
-        <div className="status">
-          <span className={`dot ${wsConnected ? "green" : "red"}`} />
-          {wsConnected ? "Connected" : "Disconnected"}
-        </div>
+    <div className="hud-canvas">
+      <div className="canvas-grid" />
+
+      <header className="hud-header">
+        <h1 className="hud-title">Aria</h1>
+        <span className="hud-subtitle">Academic Intelligence</span>
       </header>
 
-      <div className="messages">
-        {messages.map((msg, i) => {
-          if (msg.role === "tool") {
-            return (
-              <div key={i} className="message tool">
-                <strong>{msg.name}</strong>
-                <pre>{JSON.stringify(msg.data, null, 2)}</pre>
-              </div>
-            );
-          }
-          return (
-            <div key={i} className={`message ${msg.role}`}>
-              <span className="label">
-                {msg.role === "user" ? "You" : "Aria"}
-              </span>
-              <p>{msg.text}</p>
-            </div>
-          );
-        })}
-
-        {assistantBuffer && (
-          <div className="message assistant streaming">
-            <span className="label">Aria</span>
-            <p>{assistantBuffer}</p>
-          </div>
-        )}
-
-        {partial && (
-          <div className="message user partial">
-            <span className="label">You</span>
-            <p>{partial}...</p>
-          </div>
-        )}
+      <div className="widget-layer">
+        {widgets.map((w) => (
+          <Widget
+            key={w.id}
+            widget={w}
+            onClose={removeWidget}
+            onMinimize={toggleMinimize}
+            onPositionChange={updatePosition}
+            onBringToFront={bringToFront}
+          />
+        ))}
       </div>
 
-      <div className="controls">
-        {!sessionStarted ? (
-          <button className="mic-button" onClick={startSession}>
-            Start Talking
-          </button>
-        ) : (
-          <div className="mic-status">
-            <span className={`dot ${isListening ? "green pulse" : "red"}`} />
-            {isProcessing ? "Thinking..." : isListening ? "Listening" : "Ready"}
-          </div>
-        )}
-      </div>
+      <VoiceOrb
+        isListening={isListening}
+        isProcessing={isProcessing}
+        sessionStarted={sessionStarted}
+        wsConnected={wsConnected}
+        onStartSession={startSession}
+        partial={partial}
+      />
+
+      <TranscriptPanel
+        messages={messages}
+        assistantBuffer={assistantBuffer}
+        isOpen={transcriptOpen}
+        onToggle={() => setTranscriptOpen((o) => !o)}
+      />
     </div>
   );
 }
