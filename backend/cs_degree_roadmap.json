@@ -1,0 +1,279 @@
+{
+  "major": "Computer Science, B.S.",
+  "nodes": [
+    {
+      "id": "TRU120",
+      "name": "First Year Sem",
+      "credits": 3,
+      "status": "completed",
+      "grade": "A",
+      "prereqs": []
+    },
+    {
+      "id": "CS100",
+      "name": "CS Seminar",
+      "credits": 1,
+      "status": "completed",
+      "grade": "A",
+      "prereqs": []
+    },
+    {
+      "id": "CS180",
+      "name": "Foundations of CS I",
+      "credits": 4,
+      "status": "completed",
+      "grade": "B+",
+      "prereqs": []
+    },
+    {
+      "id": "MATH198",
+      "name": "Calculus I",
+      "credits": 5,
+      "status": "completed",
+      "grade": "A-",
+      "prereqs": []
+    },
+    {
+      "id": "LANG1",
+      "name": "Elem Foreign Lang I",
+      "credits": 3,
+      "status": "completed",
+      "grade": "A",
+      "prereqs": []
+    },
+    {
+      "id": "CS181",
+      "name": "Foundations of CS II",
+      "credits": 3,
+      "status": "in_progress",
+      "prereqs": [
+        "CS180"
+      ]
+    },
+    {
+      "id": "CS191",
+      "name": "Computing Struct.",
+      "credits": 3,
+      "status": "in_progress",
+      "prereqs": []
+    },
+    {
+      "id": "MATH263",
+      "name": "Calculus II",
+      "credits": 4,
+      "status": "in_progress",
+      "prereqs": [
+        "MATH198"
+      ]
+    },
+    {
+      "id": "LANG2",
+      "name": "Elem Foreign Lang II",
+      "credits": 3,
+      "status": "in_progress",
+      "prereqs": [
+        "LANG1"
+      ]
+    },
+    {
+      "id": "DIAL1",
+      "name": "Dialogues Course",
+      "credits": 3,
+      "status": "in_progress",
+      "prereqs": []
+    },
+    {
+      "id": "CS250",
+      "name": "Systems Programming",
+      "credits": 3,
+      "status": "planned",
+      "prereqs": [
+        "CS181"
+      ]
+    },
+    {
+      "id": "CS260",
+      "name": "OOP & Design",
+      "credits": 3,
+      "status": "planned",
+      "prereqs": [
+        "CS181"
+      ]
+    },
+    {
+      "id": "CS291",
+      "name": "Models of Comp.",
+      "credits": 3,
+      "status": "planned",
+      "prereqs": [
+        "CS191"
+      ]
+    },
+    {
+      "id": "DIAL2",
+      "name": "Dialogues Course",
+      "credits": 3,
+      "status": "planned",
+      "prereqs": []
+    },
+    {
+      "id": "CS310",
+      "name": "Data Struct & Algo",
+      "credits": 3,
+      "status": "planned",
+      "prereqs": [
+        "CS181"
+      ]
+    },
+    {
+      "id": "CS330",
+      "name": "Comp. Architecture",
+      "credits": 3,
+      "status": "planned",
+      "prereqs": [
+        "CS250"
+      ]
+    },
+    {
+      "id": "STAT290",
+      "name": "Statistics",
+      "credits": 3,
+      "status": "planned",
+      "prereqs": [
+        "MATH263"
+      ]
+    },
+    {
+      "id": "SUPP1",
+      "name": "Required Support",
+      "credits": 3,
+      "status": "planned",
+      "prereqs": []
+    },
+    {
+      "id": "DIAL3",
+      "name": "Dialogues Course",
+      "credits": 3,
+      "status": "planned",
+      "prereqs": []
+    },
+    {
+      "id": "CSELEC1",
+      "name": "CS Elective",
+      "credits": 3,
+      "status": "planned",
+      "prereqs": [
+        "CS260"
+      ]
+    },
+    {
+      "id": "JINS3XX",
+      "name": "JINS 3XX: WE",
+      "credits": 3,
+      "status": "planned",
+      "prereqs": []
+    },
+    {
+      "id": "BSREQ1",
+      "name": "BS Requirement",
+      "credits": 3,
+      "status": "planned",
+      "prereqs": []
+    },
+    {
+      "id": "DIAL4",
+      "name": "Dialogues Course",
+      "credits": 3,
+      "status": "planned",
+      "prereqs": []
+    },
+    {
+      "id": "CSELEC2",
+      "name": "CS Elective",
+      "credits": 3,
+      "status": "planned",
+      "prereqs": [
+        "CS310"
+      ]
+    },
+    {
+      "id": "CS345",
+      "name": "WE/Cyberethics",
+      "credits": 3,
+      "status": "planned",
+      "prereqs": []
+    },
+    {
+      "id": "ELEC1",
+      "name": "Free Elective",
+      "credits": 3,
+      "status": "planned",
+      "prereqs": []
+    },
+    {
+      "id": "DIAL5",
+      "name": "Dialogues Course",
+      "credits": 3,
+      "status": "planned",
+      "prereqs": []
+    },
+    {
+      "id": "CS495",
+      "name": "Senior CS Sem",
+      "credits": 1,
+      "status": "planned",
+      "prereqs": [
+        "CSELEC1"
+      ]
+    },
+    {
+      "id": "CSELEC3",
+      "name": "CS Elective",
+      "credits": 3,
+      "status": "planned",
+      "prereqs": []
+    },
+    {
+      "id": "ELEC2",
+      "name": "Free Elective",
+      "credits": 3,
+      "status": "planned",
+      "prereqs": []
+    },
+    {
+      "id": "BSREQ2",
+      "name": "BS Requirement",
+      "credits": 3,
+      "status": "planned",
+      "prereqs": []
+    },
+    {
+      "id": "DIAL6",
+      "name": "Dialogues Course",
+      "credits": 3,
+      "status": "planned",
+      "prereqs": []
+    },
+    {
+      "id": "CSELEC4",
+      "name": "CS Elective",
+      "credits": 3,
+      "status": "planned",
+      "prereqs": []
+    },
+    {
+      "id": "ELEC3",
+      "name": "Free Elective",
+      "credits": 3,
+      "status": "planned",
+      "prereqs": []
+    },
+    {
+      "id": "DIAL7",
+      "name": "Dialogues Course",
+      "credits": 3,
+      "status": "planned",
+      "prereqs": []
+    }
+  ]
+}
