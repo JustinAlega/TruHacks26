@@ -6,10 +6,13 @@ Endpoints:
   WS   /ws            — voice pipeline WebSocket (text in, audio + text out)
 """
 
+import logging
 import os
 import json
 
 from dotenv import load_dotenv
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(message)s")
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from elevenlabs import ElevenLabs
