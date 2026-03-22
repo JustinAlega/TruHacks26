@@ -87,7 +87,7 @@ function AuthenticatedApp() {
       return addWidget(type, data, position, size ?? WIDGET_DEFAULT_SIZES[type]);
     };
     return () => {
-      delete (window as Record<string, unknown>).createWidget;
+      delete (window as any).createWidget;
     };
   }, [addWidget]);
 

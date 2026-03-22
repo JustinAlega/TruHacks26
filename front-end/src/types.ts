@@ -81,6 +81,7 @@ export interface RoadmapNode {
   status: 'completed' | 'in_progress' | 'planned' | 'available' | 'wildcard';
   grade?: string;
   prereqs: string[];
+  semester?: number;
   electiveOptions?: ElectiveOption[];
 }
 

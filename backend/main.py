@@ -36,8 +36,10 @@ elevenlabs_client = ElevenLabs(api_key=os.getenv("ELEVENLABS_API_KEY"))
 @app.get("/scribe-token")
 async def scribe_token():
     """Generate a single-use token for client-side real-time STT."""
-    token = elevenlabs_client.tokens.single_use.create("realtime_scribe")
-    return token
+    token_obj = elevenlabs_client.tokens.single_use.create("realtime_scribe")
+    # Handle both string and object returns from SDK
+    token = getattr(token_obj, "token", token_obj)
+    return {"token": token}
 
 
 @app.websocket("/ws")

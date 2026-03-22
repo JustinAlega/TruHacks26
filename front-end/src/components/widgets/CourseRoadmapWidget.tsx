@@ -115,15 +115,20 @@ export function CourseRoadmapWidget({ data }: { data: CourseRoadmapData }) {
   });
 
   const layers = computeLayers(resolvedNodes);
-  const maxLayer = Math.max(0, ...layers.values());
 
-  const columns: RoadmapNode[][] = Array.from({ length: maxLayer + 1 }, () => []);
+  const columns: RoadmapNode[][] = Array.from({ length: 8 }, () => []);
   resolvedNodes.forEach((n) => {
-    columns[layers.get(n.id) ?? 0].push(n);
+    // Use n.semester if available (1-indexed), otherwise fallback to layers
+    const semIndex = (n.semester && n.semester >= 1 && n.semester <= 8) 
+      ? n.semester - 1 
+      : (layers.get(n.id) ?? 0);
+    const safeIndex = Math.min(semIndex, 7);
+    columns[safeIndex].push(n);
   });
 
   const maxRows = Math.max(1, ...columns.map((c) => c.length));
-  const svgW = PAD_X * 2 + (maxLayer + 1) * NODE_W + maxLayer * COL_GAP;
+  const numCols = 8;
+  const svgW = PAD_X * 2 + numCols * NODE_W + (numCols - 1) * COL_GAP;
   const svgH = PAD_Y * 2 + maxRows * NODE_H + (maxRows - 1) * ROW_GAP;
 
   const positions = new Map<string, { cx: number; cy: number }>();
@@ -210,6 +215,22 @@ export function CourseRoadmapWidget({ data }: { data: CourseRoadmapData }) {
               );
             }),
           )}
+
+          {Array.from({ length: 8 }).map((_, i) => (
+            <text
+              key={`sem-label-${i}`}
+              x={PAD_X + i * (NODE_W + COL_GAP) + NODE_W / 2}
+              y={PAD_Y - 20}
+              textAnchor="middle"
+              fill="#94a3b8"
+              fontSize="12"
+              fontWeight="700"
+              fontFamily="'Inter', sans-serif"
+              opacity={0.8}
+            >
+              Semester {i + 1}
+            </text>
+          ))}
 
           {resolvedNodes.map((node) => {
             const pos = positions.get(node.id);
