@@ -9,6 +9,7 @@ Endpoints:
 import logging
 import os
 import json
+import re
 
 from dotenv import load_dotenv
 
@@ -54,7 +55,9 @@ async def websocket_endpoint(ws: WebSocket):
 
             if msg.get("type") == "transcript":
                 text = msg.get("text", "").strip()
-                if text:
+                # Filter out STT noise: parenthetical sounds like (clicking),
+                # (breathing), and very short transcripts from ambient noise
+                if text and len(text) > 2 and not re.fullmatch(r"\(.*\)", text):
                     await pipeline.handle_message(text)
     except WebSocketDisconnect:
         pass

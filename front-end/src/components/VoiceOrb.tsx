@@ -5,6 +5,7 @@ interface VoiceOrbProps {
   wsConnected: boolean;
   onStartSession: () => void;
   partial: string;
+  isReconnecting?: boolean;
 }
 
 export function VoiceOrb({
@@ -14,22 +15,27 @@ export function VoiceOrb({
   wsConnected,
   onStartSession,
   partial,
+  isReconnecting,
 }: VoiceOrbProps) {
-  const stateClass = isProcessing
-    ? 'processing'
-    : isListening
-      ? 'listening'
-      : sessionStarted
-        ? 'idle'
-        : 'inactive';
+  const stateClass = isReconnecting
+    ? 'idle'
+    : isProcessing
+      ? 'processing'
+      : isListening
+        ? 'listening'
+        : sessionStarted
+          ? 'idle'
+          : 'inactive';
 
   const statusText = !sessionStarted
     ? 'Click to begin'
-    : isProcessing
-      ? 'Thinking...'
-      : isListening
-        ? 'Listening...'
-        : 'Ready';
+    : isReconnecting
+      ? 'Reconnecting...'
+      : isProcessing
+        ? 'Thinking...'
+        : isListening
+          ? 'Listening...'
+          : 'Ready';
 
   return (
     <div className="voice-orb-container">

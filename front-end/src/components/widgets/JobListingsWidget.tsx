@@ -1,8 +1,10 @@
 import type { JobListingData } from '../../types';
 
 function timeAgo(dateStr: string): string {
+  if (!dateStr) return 'Recent';
   const now = new Date();
   const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return 'Recent';
   const diffDays = Math.floor((now.getTime() - d.getTime()) / (1000 * 60 * 60 * 24));
   if (diffDays === 0) return 'Today';
   if (diffDays === 1) return '1 day ago';

@@ -85,17 +85,16 @@ def get_canvas_courses() -> list[dict]:
     return records
 
 
-def lookup_professor(professor_name: str, school_name: str) -> dict:
-    """Look up a professor's ratings on Rate My Professors.
+def lookup_professor(professor_name: str) -> dict:
+    """Look up a professor's ratings on Rate My Professors at Truman State University.
 
     Args:
         professor_name: Full or partial name of the professor (e.g. "John Smith").
-        school_name: Name of the university (e.g. "University of Michigan").
 
     Returns a dict with: firstName, lastName, avgRating, numRatings,
     avgDifficulty, department, school name, and RMP profile link.
     """
-    school = search_school(school_name)
+    school = search_school("Truman State University")
     if not school:
         return {"error": f"School not found: {school_name}"}
 
@@ -148,7 +147,7 @@ def search_available_courses(query: str) -> list[dict]:
     Returns a list of the most relevant courses with fields: course_code,
     name, section, crn, time, professor, credits, description.
     """
-    return _search_courses(query=query)
+    return _search_courses(query=query, top_k=3)
 
 
 # List of all tool functions for Gemini

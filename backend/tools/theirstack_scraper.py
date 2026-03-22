@@ -135,6 +135,7 @@ def extract_fields(job: dict) -> dict:
         "remote": job.get("remote", False),
         "seniority": job.get("seniority", "N/A"),
         "description": (job.get("description") or "")[:300] + "...",
+        "date_posted": job.get("date_posted", ""),
     }
 
 

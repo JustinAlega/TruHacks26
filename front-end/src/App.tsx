@@ -59,9 +59,12 @@ function AuthenticatedApp() {
   const [wsConnected, setWsConnected] = useState(false);
   const [sessionStarted, setSessionStarted] = useState(false);
   const [transcriptOpen, setTranscriptOpen] = useState(false);
+  const [scribeReconnecting, setScribeReconnecting] = useState(false);
 
   const wsRef = useRef<WebSocket | null>(null);
   const playerRef = useRef<StreamingAudioPlayer | null>(null);
+  const reconnectAttemptsRef = useRef(0);
+  const maxReconnectAttempts = 3;
 
   if (!playerRef.current) {
     playerRef.current = new StreamingAudioPlayer();
@@ -98,6 +101,7 @@ function AuthenticatedApp() {
       wsRef.current = ws;
 
       ws.onopen = () => setWsConnected(true);
+      ws.onerror = (event) => console.error('[WS] Error:', event);
       ws.onclose = () => {
         setWsConnected(false);
         setTimeout(connect, 2000);
@@ -174,10 +178,54 @@ function AuthenticatedApp() {
         wsRef.current.send(JSON.stringify({ type: 'transcript', text }));
       }
     },
+    onError: (error: unknown) => {
+      console.error('[Scribe] Error:', error);
+      reconnectScribe();
+    },
+    onDisconnect: () => {
+      console.warn('[Scribe] Disconnected');
+      if (sessionStarted) reconnectScribe();
+    },
+    onSessionTimeLimitExceededError: () => {
+      console.warn('[Scribe] Session time limit exceeded');
+      reconnectScribe();
+    },
   });
 
   const isListening =
     scribe.status === 'connected' || scribe.status === 'transcribing';
+
+  const reconnectScribe = useCallback(async () => {
+    if (reconnectAttemptsRef.current >= maxReconnectAttempts) {
+      console.error('[Scribe] Max reconnect attempts reached');
+      setScribeReconnecting(false);
+      return;
+    }
+    reconnectAttemptsRef.current += 1;
+    setScribeReconnecting(true);
+    const delay = Math.min(1000 * 2 ** (reconnectAttemptsRef.current - 1), 8000);
+    console.log(`[Scribe] Reconnecting in ${delay}ms (attempt ${reconnectAttemptsRef.current})`);
+    await new Promise((r) => setTimeout(r, delay));
+    try {
+      scribe.disconnect();
+      const resp = await fetch('/scribe-token');
+      const tokenData = await resp.json();
+      await scribe.connect({
+        token: tokenData.token,
+        microphone: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        },
+      });
+      reconnectAttemptsRef.current = 0;
+      setScribeReconnecting(false);
+      console.log('[Scribe] Reconnected successfully');
+    } catch (err) {
+      console.error('[Scribe] Reconnect failed:', err);
+      setScribeReconnecting(false);
+    }
+  }, [scribe]);
 
   const startSession = useCallback(async () => {
     playerRef.current!.init();
@@ -237,6 +285,7 @@ function AuthenticatedApp() {
         wsConnected={wsConnected}
         onStartSession={startSession}
         partial={partial}
+        isReconnecting={scribeReconnecting}
       />
 
       <TranscriptPanel
