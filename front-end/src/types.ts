@@ -1,9 +1,8 @@
 export type WidgetType =
-  | 'assignments'
+  | 'academic-overview'
   | 'course-details'
   | 'professor'
   | 'course-roadmap'
-  | 'gpa'
   | 'job-listings'
   | 'schedule';
 
@@ -27,18 +26,18 @@ export interface WidgetInstance {
   minimized: boolean;
 }
 
-export interface AssignmentItem {
-  id: string;
-  courseName: string;
+export interface EnrolledCourse {
+  courseId: string;
   name: string;
-  dueDate: string;
-  status: 'upcoming' | 'submitted' | 'late' | 'missing' | 'graded';
-  pointsEarned?: number;
-  pointsPossible?: number;
+  grade?: string;
+  missingCount: number;
 }
 
-export interface AssignmentData {
-  assignments: AssignmentItem[];
+export interface AcademicOverviewData {
+  currentGPA: number;
+  totalCredits: number;
+  semesters: SemesterGPA[];
+  courses: EnrolledCourse[];
 }
 
 export interface CourseData {
@@ -64,13 +63,25 @@ export interface ProfessorData {
   topTags: string[];
 }
 
+export interface ElectiveOption {
+  course: string;
+  section: string;
+  name: string;
+  crn: string;
+  time: string;
+  professor: string;
+  description: string;
+  credits: number;
+}
+
 export interface RoadmapNode {
   id: string;
   name: string;
   credits: number;
-  status: 'completed' | 'in_progress' | 'planned' | 'available';
+  status: 'completed' | 'in_progress' | 'planned' | 'available' | 'wildcard';
   grade?: string;
   prereqs: string[];
+  electiveOptions?: ElectiveOption[];
 }
 
 export interface CourseRoadmapData {
@@ -84,11 +95,6 @@ export interface SemesterGPA {
   credits: number;
 }
 
-export interface GPAData {
-  currentGPA: number;
-  totalCredits: number;
-  semesters: SemesterGPA[];
-}
 
 export interface JobListing {
   id: string;
@@ -128,21 +134,19 @@ export type Message =
   | { role: 'tool'; name: string; data: unknown };
 
 export const WIDGET_TITLES: Record<WidgetType, string> = {
-  'assignments': 'Assignments',
+  'academic-overview': 'Academic Overview',
   'course-details': 'Course Details',
   'professor': 'Professor',
   'course-roadmap': 'Course Roadmap',
-  'gpa': 'GPA Tracker',
   'job-listings': 'Job Listings',
   'schedule': 'Schedule',
 };
 
 export const WIDGET_DEFAULT_SIZES: Record<WidgetType, Size> = {
-  'assignments': { width: 400, height: 420 },
+  'academic-overview': { width: 420, height: 460 },
   'course-details': { width: 360, height: 280 },
   'professor': { width: 340, height: 340 },
   'course-roadmap': { width: 600, height: 380 },
-  'gpa': { width: 320, height: 280 },
   'job-listings': { width: 400, height: 400 },
   'schedule': { width: 540, height: 400 },
 };
