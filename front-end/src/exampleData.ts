@@ -60,8 +60,25 @@ export const roadmapExample: CourseRoadmapData = {
     { id: 'CS301', name: 'Data Structures', credits: 3, status: 'in_progress', prereqs: ['CS201', 'MATH151'] },
     { id: 'CS310', name: 'Computer Arch.', credits: 3, status: 'planned', prereqs: ['CS201'] },
     { id: 'CS350', name: 'Software Eng.', credits: 3, status: 'in_progress', prereqs: ['CS201'] },
+    {
+      id: 'ELEC1', name: 'Free Elective', credits: 3, status: 'wildcard', prereqs: ['CS201'],
+      electiveOptions: [
+        { course: 'CS 370', section: '001', name: 'Web Development', crn: '24810', time: 'MWF 11:00–11:50', professor: 'Dr. Rivera', description: 'Modern web application development with React, Node.js, and cloud deployment.', credits: 3 },
+        { course: 'CS 380', section: '002', name: 'Database Systems', crn: '24822', time: 'TTh 1:00–2:15', professor: 'Dr. Patel', description: 'Relational databases, SQL, query optimization, transaction processing, and NoSQL systems.', credits: 3 },
+        { course: 'PHIL 210', section: '001', name: 'Ethics in Technology', crn: '30155', time: 'MWF 10:00–10:50', professor: 'Dr. Nakamura', description: 'Ethical frameworks applied to AI, privacy, surveillance, and algorithmic bias.', credits: 3 },
+        { course: 'ART 150', section: '003', name: 'Digital Media Design', crn: '31240', time: 'TTh 3:30–4:45', professor: 'Prof. Giordano', description: 'Principles of visual communication, UI/UX design, typography, and prototyping.', credits: 3 },
+      ],
+    },
     { id: 'CS401', name: 'Operating Systems', credits: 3, status: 'available', prereqs: ['CS301', 'CS310'] },
     { id: 'CS420', name: 'Artificial Intel.', credits: 3, status: 'planned', prereqs: ['CS301', 'MATH240'] },
+    {
+      id: 'ELEC2', name: 'Tech Elective', credits: 3, status: 'wildcard', prereqs: ['CS301'],
+      electiveOptions: [
+        { course: 'CS 410', section: '001', name: 'Machine Learning', crn: '25001', time: 'TTh 10:00–11:15', professor: 'Dr. Zhang', description: 'Supervised and unsupervised learning, neural networks, SVMs, and model evaluation.', credits: 3 },
+        { course: 'CS 430', section: '001', name: 'Computer Networks', crn: '25030', time: 'MWF 1:00–1:50', professor: 'Dr. Kumar', description: 'TCP/IP, routing, network security, socket programming, and distributed systems.', credits: 3 },
+        { course: 'CS 440', section: '002', name: 'Computer Graphics', crn: '25045', time: 'TTh 2:30–3:45', professor: 'Dr. Okonkwo', description: 'Rendering pipelines, shaders, ray tracing, and real-time 3D graphics with WebGL/OpenGL.', credits: 3 },
+      ],
+    },
     { id: 'CS450', name: 'Senior Project', credits: 3, status: 'planned', prereqs: ['CS350', 'CS401'] },
   ],
 };

@@ -1,10 +1,12 @@
-import type { CourseRoadmapData, RoadmapNode } from '../../types';
+import { useState, useCallback } from 'react';
+import type { CourseRoadmapData, RoadmapNode, ElectiveOption } from '../../types';
 
 const STATUS_COLORS: Record<string, { fill: string; stroke: string; text: string }> = {
   completed:   { fill: 'rgba(0, 106, 106, 0.35)', stroke: '#93f2f2', text: '#93f2f2' },
   in_progress: { fill: 'rgba(0, 106, 106, 0.15)', stroke: '#006a6a', text: '#6dd5d5' },
   planned:     { fill: 'rgba(148, 163, 184, 0.06)', stroke: 'rgba(148, 163, 184, 0.25)', text: '#64748b' },
   available:   { fill: 'rgba(0, 44, 110, 0.25)', stroke: '#3b82f6', text: '#93c5fd' },
+  wildcard:    { fill: 'rgba(245, 158, 11, 0.1)', stroke: '#f59e0b', text: '#fbbf24' },
 };
 
 const NODE_W = 120;
@@ -35,11 +37,42 @@ function computeLayers(nodes: RoadmapNode[]): Map<string, number> {
 }
 
 export function CourseRoadmapWidget({ data }: { data: CourseRoadmapData }) {
-  const layers = computeLayers(data.nodes);
+  const [selections, setSelections] = useState<Record<string, ElectiveOption>>({});
+  const [activeWildcard, setActiveWildcard] = useState<string | null>(null);
+
+  const handleNodeClick = useCallback((node: RoadmapNode) => {
+    const isResolved = selections[node.id];
+    if (node.status === 'wildcard' && !isResolved) {
+      setActiveWildcard((prev) => (prev === node.id ? null : node.id));
+    }
+  }, [selections]);
+
+  const handleSelectElective = useCallback((nodeId: string, option: ElectiveOption) => {
+    setSelections((prev) => ({ ...prev, [nodeId]: option }));
+    setActiveWildcard(null);
+  }, []);
+
+  const handleClearSelection = useCallback((nodeId: string) => {
+    setSelections((prev) => {
+      const next = { ...prev };
+      delete next[nodeId];
+      return next;
+    });
+  }, []);
+
+  const resolvedNodes = data.nodes.map((node): RoadmapNode => {
+    const sel = selections[node.id];
+    if (node.status === 'wildcard' && sel) {
+      return { ...node, id: node.id, name: sel.name, credits: sel.credits, status: 'planned' };
+    }
+    return node;
+  });
+
+  const layers = computeLayers(resolvedNodes);
   const maxLayer = Math.max(0, ...layers.values());
 
   const columns: RoadmapNode[][] = Array.from({ length: maxLayer + 1 }, () => []);
-  data.nodes.forEach((n) => {
+  resolvedNodes.forEach((n) => {
     columns[layers.get(n.id) ?? 0].push(n);
   });
 
@@ -59,90 +92,201 @@ export function CourseRoadmapWidget({ data }: { data: CourseRoadmapData }) {
     });
   });
 
+  const activeNode = activeWildcard
+    ? data.nodes.find((n) => n.id === activeWildcard)
+    : null;
+
   return (
     <div className="widget-roadmap">
       <div className="roadmap-title">{data.major}</div>
-      <div className="roadmap-svg-container">
-        <svg width={svgW} height={svgH} viewBox={`0 0 ${svgW} ${svgH}`}>
-          {data.nodes.flatMap((node) =>
-            node.prereqs.map((preId) => {
-              const from = positions.get(preId);
-              const to = positions.get(node.id);
-              if (!from || !to) return null;
-              const midX = (from.cx + to.cx) / 2;
+
+      <div className="roadmap-content" style={{ position: 'relative' }}>
+        <div className="roadmap-svg-container">
+          <svg width={svgW} height={svgH} viewBox={`0 0 ${svgW} ${svgH}`}>
+            {resolvedNodes.flatMap((node) =>
+              node.prereqs.map((preId) => {
+                const from = positions.get(preId);
+                const to = positions.get(node.id);
+                if (!from || !to) return null;
+                const midX = (from.cx + to.cx) / 2;
+                return (
+                  <path
+                    key={`${preId}-${node.id}`}
+                    d={`M${from.cx + NODE_W / 2} ${from.cy} C${midX} ${from.cy} ${midX} ${to.cy} ${to.cx - NODE_W / 2} ${to.cy}`}
+                    fill="none"
+                    stroke="rgba(147, 242, 242, 0.2)"
+                    strokeWidth="1.5"
+                  />
+                );
+              }),
+            )}
+
+            {resolvedNodes.map((node) => {
+              const pos = positions.get(node.id);
+              if (!pos) return null;
+              const origNode = data.nodes.find((n) => n.id === node.id)!;
+              const isWildcard = origNode.status === 'wildcard';
+              const isResolved = isWildcard && !!selections[node.id];
+              const isActive = activeWildcard === node.id;
+              const displayStatus = isResolved ? 'planned' : node.status;
+              const colors = STATUS_COLORS[displayStatus] ?? STATUS_COLORS.planned;
+              const x = pos.cx - NODE_W / 2;
+              const y = pos.cy - NODE_H / 2;
+
               return (
-                <path
-                  key={`${preId}-${node.id}`}
-                  d={`M${from.cx + NODE_W / 2} ${from.cy} C${midX} ${from.cy} ${midX} ${to.cy} ${to.cx - NODE_W / 2} ${to.cy}`}
-                  fill="none"
-                  stroke="rgba(147, 242, 242, 0.2)"
-                  strokeWidth="1.5"
-                />
+                <g
+                  key={node.id}
+                  onClick={() => handleNodeClick(origNode)}
+                  style={{ cursor: isWildcard && !isResolved ? 'pointer' : 'default' }}
+                >
+                  <rect
+                    x={x} y={y}
+                    width={NODE_W} height={NODE_H}
+                    rx={8}
+                    fill={colors.fill}
+                    stroke={isActive ? '#fbbf24' : colors.stroke}
+                    strokeWidth={isActive ? 2 : isWildcard && !isResolved ? 1.5 : 1}
+                    strokeDasharray={isWildcard && !isResolved ? '4 3' : 'none'}
+                    opacity={node.status === 'planned' && !isResolved ? 0.6 : 1}
+                  />
+
+                  {isWildcard && !isResolved ? (
+                    <>
+                      <text
+                        x={pos.cx} y={pos.cy - 5}
+                        textAnchor="middle"
+                        fill={colors.text}
+                        fontSize="16"
+                        fontWeight="700"
+                        fontFamily="'Inter', sans-serif"
+                      >
+                        +
+                      </text>
+                      <text
+                        x={pos.cx} y={pos.cy + 11}
+                        textAnchor="middle"
+                        fill={colors.text}
+                        fontSize="8"
+                        fontFamily="'Inter', sans-serif"
+                        opacity={0.8}
+                      >
+                        Free Elective
+                      </text>
+                    </>
+                  ) : (
+                    <>
+                      <text
+                        x={pos.cx} y={pos.cy - 6}
+                        textAnchor="middle"
+                        fill={isResolved ? '#93c5fd' : colors.text}
+                        fontSize="11"
+                        fontWeight="600"
+                        fontFamily="'Inter', sans-serif"
+                      >
+                        {isResolved ? selections[node.id].course : node.id}
+                      </text>
+                      <text
+                        x={pos.cx} y={pos.cy + 10}
+                        textAnchor="middle"
+                        fill={isResolved ? '#93c5fd' : colors.text}
+                        fontSize="9"
+                        fontFamily="'Inter', sans-serif"
+                        opacity={0.75}
+                      >
+                        {node.name}
+                      </text>
+                      {node.grade && (
+                        <text
+                          x={x + NODE_W - 8} y={y + 12}
+                          textAnchor="end"
+                          fill="#93f2f2"
+                          fontSize="9"
+                          fontWeight="600"
+                          fontFamily="'Inter', sans-serif"
+                        >
+                          {node.grade}
+                        </text>
+                      )}
+                    </>
+                  )}
+
+                  {isResolved && (
+                    <g
+                      onClick={(e) => { e.stopPropagation(); handleClearSelection(node.id); }}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <circle cx={x + NODE_W - 4} cy={y + 4} r={7} fill="rgba(30,30,40,0.85)" />
+                      <text
+                        x={x + NODE_W - 4} y={y + 4}
+                        textAnchor="middle"
+                        dominantBaseline="central"
+                        fill="#94a3b8"
+                        fontSize="9"
+                        fontWeight="600"
+                        fontFamily="'Inter', sans-serif"
+                      >
+                        ×
+                      </text>
+                    </g>
+                  )}
+                </g>
               );
-            }),
-          )}
+            })}
+          </svg>
+        </div>
 
-          {data.nodes.map((node) => {
-            const pos = positions.get(node.id);
-            if (!pos) return null;
-            const colors = STATUS_COLORS[node.status];
-            const x = pos.cx - NODE_W / 2;
-            const y = pos.cy - NODE_H / 2;
-
-            return (
-              <g key={node.id}>
-                <rect
-                  x={x} y={y}
-                  width={NODE_W} height={NODE_H}
-                  rx={8}
-                  fill={colors.fill}
-                  stroke={colors.stroke}
-                  strokeWidth={node.status === 'in_progress' ? 1.5 : 1}
-                  opacity={node.status === 'planned' ? 0.6 : 1}
-                />
-                <text
-                  x={pos.cx} y={pos.cy - 6}
-                  textAnchor="middle"
-                  fill={colors.text}
-                  fontSize="11"
-                  fontWeight="600"
-                  fontFamily="'Inter', sans-serif"
+        {activeNode && activeNode.electiveOptions && (
+          <div className="elective-overlay">
+            <div className="elective-overlay-header">
+              <span className="elective-overlay-title">Choose an Elective</span>
+              <button
+                className="elective-overlay-close"
+                onClick={() => setActiveWildcard(null)}
+              >
+                <svg width="12" height="12" viewBox="0 0 12 12">
+                  <line x1="2" y1="2" x2="10" y2="10" stroke="currentColor" strokeWidth="1.5" />
+                  <line x1="10" y1="2" x2="2" y2="10" stroke="currentColor" strokeWidth="1.5" />
+                </svg>
+              </button>
+            </div>
+            <div className="elective-list">
+              {activeNode.electiveOptions.map((opt) => (
+                <button
+                  key={opt.crn}
+                  className="elective-option"
+                  onClick={() => handleSelectElective(activeNode.id, opt)}
                 >
-                  {node.id}
-                </text>
-                <text
-                  x={pos.cx} y={pos.cy + 10}
-                  textAnchor="middle"
-                  fill={colors.text}
-                  fontSize="9"
-                  fontFamily="'Inter', sans-serif"
-                  opacity={0.75}
-                >
-                  {node.name}
-                </text>
-                {node.grade && (
-                  <text
-                    x={x + NODE_W - 8} y={y + 12}
-                    textAnchor="end"
-                    fill="#93f2f2"
-                    fontSize="9"
-                    fontWeight="600"
-                    fontFamily="'Inter', sans-serif"
-                  >
-                    {node.grade}
-                  </text>
-                )}
-              </g>
-            );
-          })}
-        </svg>
+                  <div className="elective-option-top">
+                    <span className="elective-option-course">{opt.course}</span>
+                    <span className="elective-option-section">§{opt.section}</span>
+                    <span className="elective-option-credits">{opt.credits} cr</span>
+                  </div>
+                  <div className="elective-option-name">{opt.name}</div>
+                  <div className="elective-option-meta">
+                    <span>{opt.professor}</span>
+                    <span className="meta-separator">·</span>
+                    <span>{opt.time}</span>
+                  </div>
+                  <div className="elective-option-desc">{opt.description}</div>
+                  <div className="elective-option-crn">CRN {opt.crn}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="roadmap-legend">
         {Object.entries(STATUS_COLORS).map(([status, colors]) => (
           <div key={status} className="legend-item">
-            <span className="legend-dot" style={{ background: colors.stroke }} />
-            <span>{status.replace('_', ' ')}</span>
+            <span
+              className="legend-dot"
+              style={{
+                background: colors.stroke,
+                borderRadius: status === 'wildcard' ? '2px' : '50%',
+              }}
+            />
+            <span>{status === 'wildcard' ? 'free elective' : status.replace('_', ' ')}</span>
           </div>
         ))}
       </div>

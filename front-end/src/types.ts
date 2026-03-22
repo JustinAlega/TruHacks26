@@ -63,13 +63,25 @@ export interface ProfessorData {
   topTags: string[];
 }
 
+export interface ElectiveOption {
+  course: string;
+  section: string;
+  name: string;
+  crn: string;
+  time: string;
+  professor: string;
+  description: string;
+  credits: number;
+}
+
 export interface RoadmapNode {
   id: string;
   name: string;
   credits: number;
-  status: 'completed' | 'in_progress' | 'planned' | 'available';
+  status: 'completed' | 'in_progress' | 'planned' | 'available' | 'wildcard';
   grade?: string;
   prereqs: string[];
+  electiveOptions?: ElectiveOption[];
 }
 
 export interface CourseRoadmapData {
