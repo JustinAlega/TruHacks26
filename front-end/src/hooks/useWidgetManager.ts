@@ -7,18 +7,52 @@ function generateId(): string {
   return `widget-${Date.now()}-${++globalIdCounter}`;
 }
 
+// Grid-zone placement: 3 columns × 2 rows, cycling through zones
+const ZONE_COLS = 3;
+const ZONE_ROWS = 2;
+const ZONE_COUNT = ZONE_COLS * ZONE_ROWS;
+const ZONE_PADDING = 20;
+const ZONE_JITTER = 20;
+const VOICE_ORB_MARGIN = 150; // px from bottom to avoid VoiceOrb
+
+function getZonePosition(zoneIndex: number, widgetWidth: number, widgetHeight: number): Position {
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const usableH = vh - VOICE_ORB_MARGIN;
+
+  const col = zoneIndex % ZONE_COLS;
+  const row = Math.floor(zoneIndex / ZONE_COLS);
+
+  const zoneW = vw / ZONE_COLS;
+  const zoneH = usableH / ZONE_ROWS;
+
+  // Center the widget within its zone, then add jitter
+  const jitterX = (Math.random() * 2 - 1) * ZONE_JITTER;
+  const jitterY = (Math.random() * 2 - 1) * ZONE_JITTER;
+  let x = col * zoneW + (zoneW - widgetWidth) / 2 + jitterX;
+  let y = row * zoneH + (zoneH - widgetHeight) / 2 + jitterY;
+
+  // Clamp within viewport bounds
+  x = Math.max(ZONE_PADDING, Math.min(x, vw - widgetWidth - ZONE_PADDING));
+  y = Math.max(ZONE_PADDING, Math.min(y, usableH - widgetHeight - ZONE_PADDING));
+
+  return { x, y };
+}
+
 export function useWidgetManager(initialWidgets: WidgetInstance[] = []) {
   const [widgets, setWidgets] = useState<WidgetInstance[]>(initialWidgets);
   const nextZIndex = useRef(initialWidgets.length + 1);
+  const nextZoneIndex = useRef(0);
 
   const addWidget = useCallback(
     (type: WidgetType, data: unknown, position?: Position, size?: Size): string => {
       const id = generateId();
       const resolvedSize = size ?? WIDGET_DEFAULT_SIZES[type];
-      const resolvedPosition = position ?? {
-        x: 60 + Math.random() * 200,
-        y: 60 + Math.random() * 200,
-      };
+      const resolvedPosition = position ?? getZonePosition(
+        nextZoneIndex.current++ % ZONE_COUNT,
+        resolvedSize.width,
+        resolvedSize.height,
+      );
 
       setWidgets((prev) => [
         ...prev,
