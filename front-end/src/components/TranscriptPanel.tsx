@@ -54,7 +54,7 @@ export function TranscriptPanel({
             return (
               <div key={i} className={`transcript-msg ${msg.role}`}>
                 <span className="transcript-label">
-                  {msg.role === 'user' ? 'You' : 'Aria'}
+                  {msg.role === 'user' ? 'You' : 'A.R.I.A.'}
                 </span>
                 <p>{msg.text}</p>
               </div>
@@ -63,14 +63,14 @@ export function TranscriptPanel({
 
           {assistantBuffer && (
             <div className="transcript-msg assistant streaming">
-              <span className="transcript-label">Aria</span>
+              <span className="transcript-label">A.R.I.A.</span>
               <p>{assistantBuffer}</p>
             </div>
           )}
 
           {messages.length === 0 && !assistantBuffer && (
             <div className="transcript-empty">
-              Start talking to Aria to see the conversation here.
+              Start talking to A.R.I.A. to see the conversation here.
             </div>
           )}
         </div>

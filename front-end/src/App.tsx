@@ -207,8 +207,8 @@ function AuthenticatedApp() {
       <div className="canvas-grid" />
 
       <header className="hud-header">
-        <h1 className="hud-title">Aria</h1>
-        <span className="hud-subtitle">Academic Intelligence</span>
+        <h1 className="hud-title">A.R.I.A.</h1>
+        <span className="hud-subtitle">Academic Resource Intelligence Assistant</span>
       </header>
 
       <div className="widget-layer">

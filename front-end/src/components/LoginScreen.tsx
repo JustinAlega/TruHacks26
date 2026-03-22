@@ -34,8 +34,8 @@ export function LoginScreen() {
         <div className="login-accent-line" />
 
         <div className="login-brand">
-          <h1 className="login-title">Aria</h1>
-          <span className="login-subtitle">Academic Intelligence</span>
+          <h1 className="login-title">A.R.I.A.</h1>
+          <span className="login-subtitle">Academic Resource Intelligence Assistant</span>
         </div>
 
         <form className="login-form" onSubmit={handleSubmit}>
