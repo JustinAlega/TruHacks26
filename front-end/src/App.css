@@ -1,4 +1,206 @@
 /* ═══════════════════════════════════════════════════════════
+   Login Screen
+   ═══════════════════════════════════════════════════════════ */
+
+.login-screen {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.login-grid {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(100, 200, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(100, 200, 255, 0.025) 1px, transparent 1px);
+  background-size: 40px 40px;
+  z-index: 0;
+}
+
+.login-card {
+  position: relative;
+  z-index: 1;
+  width: 380px;
+  background: rgba(15, 23, 42, 0.72);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-widget);
+  overflow: hidden;
+  animation: widget-appear 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.login-accent-line {
+  height: 2px;
+  background: linear-gradient(90deg, var(--secondary), var(--secondary-fixed), transparent);
+  opacity: 0.6;
+}
+
+.login-brand {
+  text-align: center;
+  padding: var(--sp-24) var(--sp-24) 0;
+}
+
+.login-title {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, var(--secondary-fixed), var(--secondary-fixed-dim));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+}
+
+.login-subtitle {
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 400;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--on-surface-dim);
+  display: block;
+  margin-top: 4px;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-16);
+  padding: var(--sp-24);
+}
+
+.login-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-6);
+}
+
+.login-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--on-surface-variant);
+}
+
+.login-input {
+  width: 100%;
+  padding: var(--sp-12) var(--sp-16);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--on-surface);
+  background: rgba(148, 163, 184, 0.06);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: var(--radius-sm);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.login-input::placeholder {
+  color: var(--on-surface-dim);
+}
+
+.login-input:focus {
+  border-color: var(--secondary);
+  box-shadow: 0 0 0 3px rgba(0, 106, 106, 0.15);
+}
+
+.login-error {
+  font-size: 0.78rem;
+  color: #fca5a5;
+  background: rgba(239, 68, 68, 0.1);
+  padding: var(--sp-8) var(--sp-12);
+  border-radius: var(--radius-sm);
+  margin: 0;
+}
+
+.login-btn {
+  width: 100%;
+  padding: var(--sp-12) var(--sp-16);
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--on-primary);
+  background: linear-gradient(135deg, var(--secondary), var(--secondary-fixed-dim));
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.login-btn:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.login-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.login-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.login-switch {
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--on-surface-dim);
+  padding: 0 var(--sp-24) var(--sp-24);
+}
+
+.login-switch-btn {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--secondary-fixed);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: opacity 0.15s ease;
+}
+
+.login-switch-btn:hover {
+  opacity: 0.8;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Loading Spinner (auth check)
+   ═══════════════════════════════════════════════════════════ */
+
+.auth-loading {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface);
+}
+
+.auth-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(147, 242, 242, 0.15);
+  border-top-color: var(--secondary-fixed);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ═══════════════════════════════════════════════════════════
    HUD Canvas — Full viewport dark canvas with grid overlay
    ═══════════════════════════════════════════════════════════ */
 

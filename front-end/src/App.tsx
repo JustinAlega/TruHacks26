@@ -2,10 +2,12 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { useScribe, CommitStrategy } from '@elevenlabs/react';
 import { StreamingAudioPlayer } from './audioPlayer';
 import { useWidgetManager } from './hooks/useWidgetManager';
+import { useAuth } from './context/AuthContext';
 import { Widget } from './components/Widget';
 import { WidgetDock } from './components/WidgetDock';
 import { VoiceOrb } from './components/VoiceOrb';
 import { TranscriptPanel } from './components/TranscriptPanel';
+import { LoginScreen } from './components/LoginScreen';
 import { EXAMPLE_WIDGETS } from './exampleData';
 import type { Message, WidgetType, WidgetInstance, Position, Size } from './types';
 import { WIDGET_DEFAULT_SIZES } from './types';
@@ -32,6 +34,24 @@ declare global {
 }
 
 function App() {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="auth-loading">
+        <div className="auth-spinner" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <LoginScreen />;
+  }
+
+  return <AuthenticatedApp />;
+}
+
+function AuthenticatedApp() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [partial, setPartial] = useState('');
   const [assistantBuffer, setAssistantBuffer] = useState('');
