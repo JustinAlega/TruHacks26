@@ -78,7 +78,7 @@ function AuthenticatedApp() {
     updatePosition,
     bringToFront,
     toggleMinimize,
-  } = useWidgetManager(buildInitialWidgets());
+  } = useWidgetManager([]);
 
   const addWidgetRef = useRef(addWidget);
 
