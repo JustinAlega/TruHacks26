@@ -68,7 +68,7 @@ export class StreamingAudioPlayer {
 
     this.isAppending = true;
     const chunk = this.queue.shift()!;
-    this.sourceBuffer.appendBuffer(chunk);
+    this.sourceBuffer.appendBuffer(chunk as any);
 
     // Start playback on first chunk
     if (!this.isPlaying && this.audio) {

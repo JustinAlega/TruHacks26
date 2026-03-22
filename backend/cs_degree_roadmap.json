@@ -7,7 +7,8 @@
       "credits": 3,
       "status": "completed",
       "grade": "A",
-      "prereqs": []
+      "prereqs": [],
+      "semester": 1
     },
     {
       "id": "CS100",
@@ -15,7 +16,8 @@
       "credits": 1,
       "status": "completed",
       "grade": "A",
-      "prereqs": []
+      "prereqs": [],
+      "semester": 1
     },
     {
       "id": "CS180",
@@ -23,7 +25,8 @@
       "credits": 4,
       "status": "completed",
       "grade": "B+",
-      "prereqs": []
+      "prereqs": [],
+      "semester": 1
     },
     {
       "id": "MATH198",
@@ -31,7 +34,8 @@
       "credits": 5,
       "status": "completed",
       "grade": "A-",
-      "prereqs": []
+      "prereqs": [],
+      "semester": 1
     },
     {
       "id": "LANG1",
@@ -39,7 +43,8 @@
       "credits": 3,
       "status": "completed",
       "grade": "A",
-      "prereqs": []
+      "prereqs": [],
+      "semester": 1
     },
     {
       "id": "CS181",
@@ -48,14 +53,16 @@
       "status": "in_progress",
       "prereqs": [
         "CS180"
-      ]
+      ],
+      "semester": 2
     },
     {
       "id": "CS191",
       "name": "Computing Struct.",
       "credits": 3,
       "status": "in_progress",
-      "prereqs": []
+      "prereqs": [],
+      "semester": 2
     },
     {
       "id": "MATH263",
@@ -64,7 +71,8 @@
       "status": "in_progress",
       "prereqs": [
         "MATH198"
-      ]
+      ],
+      "semester": 2
     },
     {
       "id": "LANG2",
@@ -73,14 +81,16 @@
       "status": "in_progress",
       "prereqs": [
         "LANG1"
-      ]
+      ],
+      "semester": 2
     },
     {
       "id": "DIAL1",
       "name": "Dialogues Course",
       "credits": 3,
       "status": "in_progress",
-      "prereqs": []
+      "prereqs": [],
+      "semester": 2
     },
     {
       "id": "CS250",
@@ -89,7 +99,8 @@
       "status": "planned",
       "prereqs": [
         "CS181"
-      ]
+      ],
+      "semester": 3
     },
     {
       "id": "CS260",
@@ -98,7 +109,8 @@
       "status": "planned",
       "prereqs": [
         "CS181"
-      ]
+      ],
+      "semester": 3
     },
     {
       "id": "CS291",
@@ -107,14 +119,16 @@
       "status": "planned",
       "prereqs": [
         "CS191"
-      ]
+      ],
+      "semester": 3
     },
     {
       "id": "DIAL2",
       "name": "Dialogues Course",
       "credits": 3,
       "status": "planned",
-      "prereqs": []
+      "prereqs": [],
+      "semester": 3
     },
     {
       "id": "CS310",
@@ -123,7 +137,8 @@
       "status": "planned",
       "prereqs": [
         "CS181"
-      ]
+      ],
+      "semester": 4
     },
     {
       "id": "CS330",
@@ -132,7 +147,8 @@
       "status": "planned",
       "prereqs": [
         "CS250"
-      ]
+      ],
+      "semester": 4
     },
     {
       "id": "STAT290",
@@ -141,21 +157,24 @@
       "status": "planned",
       "prereqs": [
         "MATH263"
-      ]
+      ],
+      "semester": 4
     },
     {
       "id": "SUPP1",
       "name": "Required Support",
       "credits": 3,
       "status": "planned",
-      "prereqs": []
+      "prereqs": [],
+      "semester": 5
     },
     {
       "id": "DIAL3",
       "name": "Dialogues Course",
       "credits": 3,
       "status": "planned",
-      "prereqs": []
+      "prereqs": [],
+      "semester": 5
     },
     {
       "id": "CSELEC1",
@@ -164,28 +183,32 @@
       "status": "wildcard",
       "prereqs": [
         "CS260"
-      ]
+      ],
+      "semester": 5
     },
     {
       "id": "JINS3XX",
       "name": "JINS 3XX: WE",
       "credits": 3,
       "status": "wildcard",
-      "prereqs": []
+      "prereqs": [],
+      "semester": 5
     },
     {
       "id": "BSREQ1",
       "name": "BS Requirement",
       "credits": 3,
       "status": "planned",
-      "prereqs": []
+      "prereqs": [],
+      "semester": 5
     },
     {
       "id": "DIAL4",
       "name": "Dialogues Course",
       "credits": 3,
       "status": "planned",
-      "prereqs": []
+      "prereqs": [],
+      "semester": 5
     },
     {
       "id": "CSELEC2",
@@ -194,28 +217,32 @@
       "status": "wildcard",
       "prereqs": [
         "CS310"
-      ]
+      ],
+      "semester": 6
     },
     {
       "id": "CS345",
       "name": "WE/Cyberethics",
       "credits": 3,
       "status": "planned",
-      "prereqs": []
+      "prereqs": [],
+      "semester": 6
     },
     {
       "id": "ELEC1",
       "name": "Free Elective",
       "credits": 3,
       "status": "wildcard",
-      "prereqs": []
+      "prereqs": [],
+      "semester": 6
     },
     {
       "id": "DIAL5",
       "name": "Dialogues Course",
       "credits": 3,
       "status": "planned",
-      "prereqs": []
+      "prereqs": [],
+      "semester": 6
     },
     {
       "id": "CS495",
@@ -224,56 +251,64 @@
       "status": "planned",
       "prereqs": [
         "CSELEC1"
-      ]
+      ],
+      "semester": 7
     },
     {
       "id": "CSELEC3",
       "name": "CS Elective",
       "credits": 3,
       "status": "wildcard",
-      "prereqs": []
+      "prereqs": [],
+      "semester": 7
     },
     {
       "id": "ELEC2",
       "name": "Free Elective",
       "credits": 3,
       "status": "wildcard",
-      "prereqs": []
+      "prereqs": [],
+      "semester": 7
     },
     {
       "id": "BSREQ2",
       "name": "BS Requirement",
       "credits": 3,
       "status": "planned",
-      "prereqs": []
+      "prereqs": [],
+      "semester": 7
     },
     {
       "id": "DIAL6",
       "name": "Dialogues Course",
       "credits": 3,
       "status": "planned",
-      "prereqs": []
+      "prereqs": [],
+      "semester": 7
     },
     {
       "id": "CSELEC4",
       "name": "CS Elective",
       "credits": 3,
       "status": "wildcard",
-      "prereqs": []
+      "prereqs": [],
+      "semester": 8
     },
     {
       "id": "ELEC3",
       "name": "Free Elective",
       "credits": 3,
       "status": "wildcard",
-      "prereqs": []
+      "prereqs": [],
+      "semester": 8
     },
     {
       "id": "DIAL7",
       "name": "Dialogues Course",
       "credits": 3,
       "status": "planned",
-      "prereqs": []
+      "prereqs": [],
+      "semester": 8
     }
   ]
 }

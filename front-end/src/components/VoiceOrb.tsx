@@ -41,7 +41,7 @@ export function VoiceOrb({
 
       <button
         className={`voice-orb ${stateClass}`}
-        onClick={!sessionStarted ? onStartSession : undefined}
+        onClick={onStartSession}
         aria-label={sessionStarted ? statusText : 'Start voice session'}
       >
         <div className="orb-ring ring-1" />
