@@ -14,18 +14,53 @@ from tools.theirstack_scraper import search_jobs as _search_jobs, extract_fields
 import json
 import os
 
+def _fill_elective_options(node: dict) -> None:
+    """For wildcard nodes, prefill electiveOptions from the course catalog."""
+    if node.get("status") != "wildcard":
+        return
+
+    name = node.get("name", "")
+    if "CS Elective" in name:
+        query = "computer science upper level elective 300 400"
+    elif "JINS" in node.get("id", ""):
+        query = "JINS 300 level writing enriched"
+    else:
+        query = "elective course"
+
+    results = _search_courses(query=query, top_k=10)
+    node["electiveOptions"] = [
+        {
+            "course": r.get("course_code", ""),
+            "section": r.get("section", ""),
+            "name": r.get("name", ""),
+            "crn": r.get("crn", ""),
+            "time": r.get("time", ""),
+            "professor": r.get("professor", ""),
+            "description": r.get("description", ""),
+            "credits": r.get("credits", 3),
+        }
+        for r in results
+    ]
+
+
 def get_cs_degree_roadmap() -> dict:
     """Fetch the student's Computer Science degree roadmap and completion status.
-    
+
     Returns a widget payload containing the degree major and the list of course nodes
-    with prerequisite paths and completion status.
+    with prerequisite paths and completion status. Wildcard elective nodes are
+    populated with available course options from the catalog.
     """
     script_dir = os.path.dirname(os.path.abspath(__file__))
     backend_dir = os.path.dirname(script_dir)
     json_path = os.path.join(backend_dir, 'cs_degree_roadmap.json')
-    
+
     with open(json_path, 'r', encoding='utf-8') as f:
-        return json.load(f)
+        roadmap = json.load(f)
+
+    for node in roadmap.get("nodes", []):
+        _fill_elective_options(node)
+
+    return roadmap
 
 def get_canvas_courses() -> list[dict]:
     """Fetch all current courses, grades, and late assignment stats from Canvas LMS.

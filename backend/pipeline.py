@@ -346,6 +346,16 @@ class VoicePipeline:
         if tool_name == "lookup_professor":
             if result.get("error"):
                 return None
+
+            wta = result.get("wouldTakeAgainPercent", -1)
+            wta = round(wta) if wta >= 0 else 0
+
+            raw_tags = result.get("teacherRatingTags", []) or []
+            top_tags = [
+                t["tagName"]
+                for t in sorted(raw_tags, key=lambda t: t.get("tagCount", 0), reverse=True)[:5]
+            ]
+
             return {
                 "type": "widget",
                 "widget_type": "professor",
@@ -355,9 +365,9 @@ class VoicePipeline:
                     "department": result.get("department", ""),
                     "rating": result.get("avgRating", 0),
                     "difficulty": result.get("avgDifficulty", 0),
-                    "wouldTakeAgain": 0,
+                    "wouldTakeAgain": wta,
                     "numRatings": result.get("numRatings", 0),
-                    "topTags": [],
+                    "topTags": top_tags,
                 },
             }
 
@@ -365,22 +375,49 @@ class VoicePipeline:
             courses = result.get("results", [])
             if not courses:
                 return None
+
+            # Load static GPA data
+            gpa_path = os.path.join(
+                os.path.dirname(os.path.abspath(__file__)), "student_gpa.json"
+            )
+            with open(gpa_path, "r", encoding="utf-8") as f:
+                gpa_data = json.load(f)
+
             return {
                 "type": "widget",
-                "widget_type": "assignments",
+                "widget_type": "academic-overview",
                 "data": {
-                    "assignments": [
+                    "currentGPA": gpa_data["currentGPA"],
+                    "totalCredits": gpa_data["totalCredits"],
+                    "semesters": gpa_data["semesters"],
+                    "courses": [
                         {
-                            "id": str(i),
-                            "courseName": c.get("course_code", ""),
+                            "courseId": c.get("course_code", ""),
                             "name": c.get("course_name", ""),
-                            "dueDate": "",
-                            "status": "graded",
-                            "pointsEarned": c.get("current_score"),
-                            "pointsPossible": 100,
+                            "grade": c.get("current_grade", ""),
+                            "missingCount": c.get("missing_assignments", 0),
                         }
-                        for i, c in enumerate(courses)
+                        for c in courses
                     ],
+                },
+            }
+
+        if tool_name == "search_available_courses":
+            courses = result.get("results", [])
+            if not courses:
+                return None
+            top = courses[0]
+            return {
+                "type": "widget",
+                "widget_type": "course-details",
+                "data": {
+                    "name": top.get("name", ""),
+                    "courseId": top.get("course_code", ""),
+                    "description": top.get("description", ""),
+                    "term": "Spring 2026",
+                    "instructor": top.get("professor", ""),
+                    "credits": top.get("credits", 3),
+                    "schedule": top.get("time", ""),
                 },
             }
 

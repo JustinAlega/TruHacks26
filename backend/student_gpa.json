@@ -1,0 +1,10 @@
+{
+  "currentGPA": 3.67,
+  "totalCredits": 72,
+  "semesters": [
+    { "term": "Fall '24", "gpa": 3.4, "credits": 15 },
+    { "term": "Spr '25", "gpa": 3.6, "credits": 16 },
+    { "term": "Fall '25", "gpa": 3.8, "credits": 17 },
+    { "term": "Spr '26", "gpa": 3.9, "credits": 12 }
+  ]
+}

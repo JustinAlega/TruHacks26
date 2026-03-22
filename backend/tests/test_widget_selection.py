@@ -46,6 +46,7 @@ CANVAS_RESULT = {
             "current_score": 92.5,
             "current_grade": "A-",
             "late_assignments": 1,
+            "missing_assignments": 0,
             "total_assignments": 12,
         },
         {
@@ -55,8 +56,24 @@ CANVAS_RESULT = {
             "current_score": 85.0,
             "current_grade": "B+",
             "late_assignments": 0,
+            "missing_assignments": 2,
             "total_assignments": 8,
         },
+    ]
+}
+
+COURSE_SEARCH_RESULT = {
+    "results": [
+        {
+            "course_code": "CS 370",
+            "name": "Web Development",
+            "section": "001",
+            "crn": "24810",
+            "time": "MWF 11:00-11:50",
+            "professor": "Dr. Rivera",
+            "credits": 3,
+            "description": "Modern web application development with React, Node.js, and cloud deployment.",
+        }
     ]
 }
 
@@ -67,6 +84,34 @@ RMP_RESULT = {
     "numRatings": 47,
     "avgDifficulty": 3.1,
     "department": "Computer Science",
+    "rmp_link": "https://www.ratemyprofessors.com/professor/12345",
+}
+
+RMP_RESULT_FULL = {
+    "firstName": "Sarah",
+    "lastName": "Chen",
+    "avgRating": 4.2,
+    "numRatings": 47,
+    "avgDifficulty": 3.1,
+    "department": "Computer Science",
+    "wouldTakeAgainPercent": 89.0,
+    "teacherRatingTags": [
+        {"tagName": "Caring", "tagCount": 20},
+        {"tagName": "Tough Grader", "tagCount": 15},
+        {"tagName": "Amazing Lectures", "tagCount": 10},
+    ],
+    "rmp_link": "https://www.ratemyprofessors.com/professor/12345",
+}
+
+RMP_RESULT_NO_WTA = {
+    "firstName": "Sarah",
+    "lastName": "Chen",
+    "avgRating": 4.2,
+    "numRatings": 47,
+    "avgDifficulty": 3.1,
+    "department": "Computer Science",
+    "wouldTakeAgainPercent": -1,
+    "teacherRatingTags": [],
     "rmp_link": "https://www.ratemyprofessors.com/professor/12345",
 }
 
@@ -128,21 +173,65 @@ class TestFormatWidget:
         assert msg["data"]["rating"] == 4.2
         assert msg["data"]["difficulty"] == 3.1
         assert msg["data"]["numRatings"] == 47
+        # Defaults when RMP fields are missing
+        assert msg["data"]["wouldTakeAgain"] == 0
+        assert msg["data"]["topTags"] == []
 
-    def test_format_canvas(self):
+    def test_format_professor_full_rmp_data(self):
+        p = make_pipeline()
+        args = {"professor_name": "Sarah Chen", "school_name": "Drexel"}
+        msg = p._format_widget("lookup_professor", args, RMP_RESULT_FULL)
+
+        assert msg["data"]["wouldTakeAgain"] == 89
+        assert msg["data"]["topTags"] == ["Caring", "Tough Grader", "Amazing Lectures"]
+
+    def test_format_professor_insufficient_wta(self):
+        p = make_pipeline()
+        args = {"professor_name": "Sarah Chen", "school_name": "Drexel"}
+        msg = p._format_widget("lookup_professor", args, RMP_RESULT_NO_WTA)
+
+        assert msg["data"]["wouldTakeAgain"] == 0
+        assert msg["data"]["topTags"] == []
+
+    def test_format_canvas_academic_overview(self):
         p = make_pipeline()
         msg = p._format_widget("get_canvas_courses", {}, CANVAS_RESULT)
 
         assert msg is not None
         assert msg["type"] == "widget"
-        assert msg["widget_type"] == "assignments"
-        assert len(msg["data"]["assignments"]) == 2
-        assert msg["data"]["assignments"][0]["courseName"] == "CS 301"
-        assert msg["data"]["assignments"][0]["status"] == "graded"
+        assert msg["widget_type"] == "academic-overview"
+        data = msg["data"]
+        assert "currentGPA" in data
+        assert "totalCredits" in data
+        assert "semesters" in data
+        assert len(data["courses"]) == 2
+        assert data["courses"][0]["courseId"] == "CS 301"
+        assert data["courses"][0]["name"] == "Data Structures"
+        assert data["courses"][0]["grade"] == "A-"
+        assert data["courses"][0]["missingCount"] == 0
+        assert data["courses"][1]["missingCount"] == 2
 
     def test_format_canvas_empty(self):
         p = make_pipeline()
         msg = p._format_widget("get_canvas_courses", {}, {"results": []})
+        assert msg is None
+
+    def test_format_course_details(self):
+        p = make_pipeline()
+        msg = p._format_widget("search_available_courses", {}, COURSE_SEARCH_RESULT)
+
+        assert msg is not None
+        assert msg["type"] == "widget"
+        assert msg["widget_type"] == "course-details"
+        assert msg["data"]["name"] == "Web Development"
+        assert msg["data"]["courseId"] == "CS 370"
+        assert msg["data"]["instructor"] == "Dr. Rivera"
+        assert msg["data"]["credits"] == 3
+        assert msg["data"]["schedule"] == "MWF 11:00-11:50"
+
+    def test_format_course_details_empty(self):
+        p = make_pipeline()
+        msg = p._format_widget("search_available_courses", {}, {"results": []})
         assert msg is None
 
     def test_format_unknown_tool(self):
@@ -260,7 +349,7 @@ def mock_tool_map():
                 "course_id": 101, "course_name": "Data Structures",
                 "course_code": "CS 301", "current_score": 92.5,
                 "current_grade": "A-", "late_assignments": 1,
-                "total_assignments": 12,
+                "missing_assignments": 0, "total_assignments": 12,
             },
         ]
 
@@ -269,8 +358,20 @@ def mock_tool_map():
             "firstName": "Sarah", "lastName": "Chen",
             "avgRating": 4.2, "numRatings": 47,
             "avgDifficulty": 3.1, "department": "Computer Science",
+            "wouldTakeAgainPercent": 89.0,
+            "teacherRatingTags": [{"tagName": "Caring", "tagCount": 20}],
             "rmp_link": "https://www.ratemyprofessors.com/professor/12345",
         }
+
+    def fake_course_search(query):
+        return [
+            {
+                "course_code": "CS 370", "name": "Web Development",
+                "section": "001", "crn": "24810", "time": "MWF 11:00-11:50",
+                "professor": "Dr. Rivera", "credits": 3,
+                "description": "Modern web application development.",
+            },
+        ]
 
     def fake_jobs(titles=None, technologies=None, limit=10):
         return [
@@ -289,6 +390,7 @@ def mock_tool_map():
         "get_canvas_courses": fake_canvas,
         "lookup_professor": fake_rmp,
         "search_job_listings": fake_jobs,
+        "search_available_courses": fake_course_search,
     }
 
 
@@ -317,13 +419,13 @@ async def run_pipeline_text(user_text: str) -> FakeWS:
 class TestIntegrationSingleTool:
     @pytest.mark.asyncio
     async def test_grades_query_sends_widget(self):
-        """Ask about grades → should call get_canvas_courses → assignments widget."""
+        """Ask about grades → should call get_canvas_courses → academic-overview widget."""
         ws = await run_pipeline_text("What are my current grades in all my courses?")
         widgets = ws.widget_messages()
         # Gemini may not always call the tool — verify correctness when it does
         assert len(widgets) <= 1
         if widgets:
-            assert widgets[0]["widget_type"] == "assignments"
+            assert widgets[0]["widget_type"] == "academic-overview"
 
     @pytest.mark.asyncio
     async def test_professor_query_sends_widget(self):
@@ -370,4 +472,4 @@ class TestIntegrationMultipleTool:
         # Should send at most one widget (Gemini picks the best one)
         assert len(widgets) <= 1
         if widgets:
-            assert widgets[0]["widget_type"] in ("assignments", "job-listings")
+            assert widgets[0]["widget_type"] in ("academic-overview", "job-listings")

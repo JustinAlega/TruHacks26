@@ -47,6 +47,8 @@ query TeacherSearch($query: String!, $schoolID: ID!) {
           avgRating
           numRatings
           avgDifficulty
+          wouldTakeAgainPercent
+          teacherRatingTags { tagName tagCount }
           department
           school {
             name

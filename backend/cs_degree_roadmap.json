@@ -161,7 +161,7 @@
       "id": "CSELEC1",
       "name": "CS Elective",
       "credits": 3,
-      "status": "planned",
+      "status": "wildcard",
       "prereqs": [
         "CS260"
       ]
@@ -170,7 +170,7 @@
       "id": "JINS3XX",
       "name": "JINS 3XX: WE",
       "credits": 3,
-      "status": "planned",
+      "status": "wildcard",
       "prereqs": []
     },
     {
@@ -191,7 +191,7 @@
       "id": "CSELEC2",
       "name": "CS Elective",
       "credits": 3,
-      "status": "planned",
+      "status": "wildcard",
       "prereqs": [
         "CS310"
       ]
@@ -207,7 +207,7 @@
       "id": "ELEC1",
       "name": "Free Elective",
       "credits": 3,
-      "status": "planned",
+      "status": "wildcard",
       "prereqs": []
     },
     {
@@ -230,14 +230,14 @@
       "id": "CSELEC3",
       "name": "CS Elective",
       "credits": 3,
-      "status": "planned",
+      "status": "wildcard",
       "prereqs": []
     },
     {
       "id": "ELEC2",
       "name": "Free Elective",
       "credits": 3,
-      "status": "planned",
+      "status": "wildcard",
       "prereqs": []
     },
     {
@@ -258,14 +258,14 @@
       "id": "CSELEC4",
       "name": "CS Elective",
       "credits": 3,
-      "status": "planned",
+      "status": "wildcard",
       "prereqs": []
     },
     {
       "id": "ELEC3",
       "name": "Free Elective",
       "credits": 3,
-      "status": "planned",
+      "status": "wildcard",
       "prereqs": []
     },
     {
