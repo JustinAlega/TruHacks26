@@ -52,6 +52,7 @@ function App() {
 }
 
 function AuthenticatedApp() {
+  const { signOut } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [partial, setPartial] = useState('');
   const [assistantBuffer, setAssistantBuffer] = useState('');
@@ -245,6 +246,13 @@ function AuthenticatedApp() {
         isOpen={transcriptOpen}
         onToggle={() => setTranscriptOpen((o) => !o)}
       />
+
+      <button className="logout-btn" onClick={signOut} aria-label="Sign out">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M6 2H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3M11 11l3-3-3-3M5.5 8H14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+        Sign Out
+      </button>
     </div>
   );
 }

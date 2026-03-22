@@ -1658,6 +1658,44 @@
 }
 
 /* ═══════════════════════════════════════════════════════════
+   Logout Button — bottom-right corner
+   ═══════════════════════════════════════════════════════════ */
+
+.logout-btn {
+  position: fixed;
+  bottom: var(--sp-16);
+  right: var(--sp-16);
+  z-index: 9500;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-6);
+  padding: var(--sp-6) var(--sp-12);
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--on-surface-dim);
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(148, 163, 184, 0.08);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.logout-btn:hover {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+}
+
+.logout-btn:active {
+  transform: scale(0.97);
+}
+
+/* ═══════════════════════════════════════════════════════════
    Transcript Panel — Slide-out from right
    ═══════════════════════════════════════════════════════════ */
 
