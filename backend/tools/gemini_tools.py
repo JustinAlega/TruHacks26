@@ -9,7 +9,21 @@ type hints and docstrings.
 from tools.canvas_scraper import get_courses, extract_grades, get_late_stats
 from tools.rmp_scraper import search_school, search_professor
 from tools.theirstack_scraper import search_jobs as _search_jobs, extract_fields
+import json
+import os
 
+def get_cs_degree_roadmap() -> dict:
+    """Fetch the student's Computer Science degree roadmap and completion status.
+    
+    Returns a widget payload containing the degree major and the list of course nodes
+    with prerequisite paths and completion status.
+    """
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    backend_dir = os.path.dirname(script_dir)
+    json_path = os.path.join(backend_dir, 'cs_degree_roadmap.json')
+    
+    with open(json_path, 'r', encoding='utf-8') as f:
+        return json.load(f)
 
 def get_canvas_courses() -> list[dict]:
     """Fetch all current courses, grades, and late assignment stats from Canvas LMS.
@@ -87,4 +101,4 @@ def search_job_listings(
 
 
 # List of all tool functions for Gemini
-ALL_TOOLS = [get_canvas_courses, lookup_professor, search_job_listings]
+ALL_TOOLS = [get_canvas_courses, lookup_professor, search_job_listings, get_cs_degree_roadmap]
