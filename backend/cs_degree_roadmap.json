@@ -38,8 +38,8 @@
       "semester": 1
     },
     {
-      "id": "LANG1",
-      "name": "Elem Foreign Lang I",
+      "id": "SPAN 101",
+      "name": "Elementary Spanish I",
       "credits": 3,
       "status": "completed",
       "grade": "A",
@@ -50,7 +50,8 @@
       "id": "CS181",
       "name": "Foundations of CS II",
       "credits": 3,
-      "status": "in_progress",
+      "status": "completed",
+      "grade": "A-",
       "prereqs": [
         "CS180"
       ],
@@ -60,7 +61,8 @@
       "id": "CS191",
       "name": "Computing Struct.",
       "credits": 3,
-      "status": "in_progress",
+      "status": "completed",
+      "grade": "B+",
       "prereqs": [],
       "semester": 2
     },
@@ -68,27 +70,30 @@
       "id": "MATH263",
       "name": "Calculus II",
       "credits": 4,
-      "status": "in_progress",
+      "status": "completed",
+      "grade": "A",
       "prereqs": [
         "MATH198"
       ],
       "semester": 2
     },
     {
-      "id": "LANG2",
-      "name": "Elem Foreign Lang II",
+      "id": "SPAN 102",
+      "name": "Elementary Spanish II",
       "credits": 3,
-      "status": "in_progress",
+      "status": "completed",
+      "grade": "A",
       "prereqs": [
-        "LANG1"
+        "SPAN 101"
       ],
       "semester": 2
     },
     {
-      "id": "DIAL1",
-      "name": "Dialogues Course",
+      "id": "PHRE 186",
+      "name": "Introduction to Philosophy",
       "credits": 3,
-      "status": "in_progress",
+      "status": "completed",
+      "grade": "B",
       "prereqs": [],
       "semester": 2
     },
@@ -96,7 +101,8 @@
       "id": "CS250",
       "name": "Systems Programming",
       "credits": 3,
-      "status": "planned",
+      "status": "completed",
+      "grade": "B+",
       "prereqs": [
         "CS181"
       ],
@@ -106,7 +112,8 @@
       "id": "CS260",
       "name": "OOP & Design",
       "credits": 3,
-      "status": "planned",
+      "status": "completed",
+      "grade": "A-",
       "prereqs": [
         "CS181"
       ],
@@ -116,17 +123,19 @@
       "id": "CS291",
       "name": "Models of Comp.",
       "credits": 3,
-      "status": "planned",
+      "status": "completed",
+      "grade": "B",
       "prereqs": [
         "CS191"
       ],
       "semester": 3
     },
     {
-      "id": "DIAL2",
-      "name": "Dialogues Course",
+      "id": "LING 238",
+      "name": "Intro to Linguistics",
       "credits": 3,
-      "status": "planned",
+      "status": "completed",
+      "grade": "A-",
       "prereqs": [],
       "semester": 3
     },
@@ -134,7 +143,7 @@
       "id": "CS310",
       "name": "Data Struct & Algo",
       "credits": 3,
-      "status": "planned",
+      "status": "in_progress",
       "prereqs": [
         "CS181"
       ],
@@ -144,7 +153,7 @@
       "id": "CS330",
       "name": "Comp. Architecture",
       "credits": 3,
-      "status": "planned",
+      "status": "in_progress",
       "prereqs": [
         "CS250"
       ],
@@ -154,23 +163,23 @@
       "id": "STAT290",
       "name": "Statistics",
       "credits": 3,
-      "status": "planned",
+      "status": "in_progress",
       "prereqs": [
         "MATH263"
       ],
       "semester": 4
     },
     {
-      "id": "SUPP1",
-      "name": "Required Support",
-      "credits": 3,
-      "status": "planned",
-      "prereqs": [],
-      "semester": 5
-    },
-    {
       "id": "DIAL3",
       "name": "Dialogues Course",
+      "credits": 3,
+      "status": "in_progress",
+      "prereqs": [],
+      "semester": 4
+    },
+    {
+      "id": "SUPP1",
+      "name": "Required Support",
       "credits": 3,
       "status": "planned",
       "prereqs": [],
