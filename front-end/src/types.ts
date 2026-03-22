@@ -147,7 +147,7 @@ export const WIDGET_DEFAULT_SIZES: Record<WidgetType, Size> = {
   'academic-overview': { width: 420, height: 460 },
   'course-details': { width: 360, height: 280 },
   'professor': { width: 340, height: 340 },
-  'course-roadmap': { width: 600, height: 380 },
+  'course-roadmap': { width: 780, height: 500 },
   'job-listings': { width: 400, height: 400 },
   'schedule': { width: 540, height: 400 },
 };

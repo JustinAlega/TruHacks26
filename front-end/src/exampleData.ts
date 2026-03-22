@@ -132,7 +132,7 @@ export const EXAMPLE_WIDGETS: ExampleWidget[] = [
     type: 'course-roadmap',
     data: roadmapExample,
     position: { x: 40, y: 540 },
-    size: { width: 620, height: 380 },
+    size: { width: 780, height: 500 },
   },
   {
     type: 'course-details',
