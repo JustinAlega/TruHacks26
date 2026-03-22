@@ -56,49 +56,60 @@ await self.ws.send_json({
 
 ## Supported Widget Types
 
-### 1. `"assignments"` — Upcoming & Past Assignments
+### 1. `"academic-overview"` — GPA, Current Courses & Missing Assignments
 
-Default size: 400 × 420
+Default size: 420 × 460
+
+Unified widget combining GPA trend, enrolled courses with current grades, and missing assignment counts.
 
 ```json
 {
   "type": "widget",
-  "widget_type": "assignments",
+  "widget_type": "academic-overview",
   "data": {
-    "assignments": [
-      {
-        "id": "a1",
-        "courseName": "CS 301",
-        "name": "Binary Tree Implementation",
-        "dueDate": "2026-03-25T23:59:00Z",
-        "status": "upcoming",
-        "pointsPossible": 100
-      },
-      {
-        "id": "a2",
-        "courseName": "CS 301",
-        "name": "AVL Tree Quiz",
-        "dueDate": "2026-03-18T23:59:00Z",
-        "status": "graded",
-        "pointsEarned": 92,
-        "pointsPossible": 100
-      }
+    "currentGPA": 3.67,
+    "totalCredits": 72,
+    "semesters": [
+      { "term": "Fall '24", "gpa": 3.4, "credits": 15 },
+      { "term": "Spr '25", "gpa": 3.6, "credits": 16 },
+      { "term": "Fall '25", "gpa": 3.8, "credits": 17 },
+      { "term": "Spr '26", "gpa": 3.9, "credits": 12 }
+    ],
+    "courses": [
+      { "courseId": "CS 301", "name": "Data Structures & Algorithms", "grade": "A-", "missingCount": 0 },
+      { "courseId": "MATH 240", "name": "Linear Algebra", "grade": "B+", "missingCount": 1 },
+      { "courseId": "CS 350", "name": "Software Engineering", "grade": "A", "missingCount": 0 },
+      { "courseId": "ENG 102", "name": "English Composition II", "grade": "B", "missingCount": 2 }
     ]
   }
 }
 ```
 
-**Assignment object fields:**
+**Top-level fields:**
 
-| Field            | Type   | Required | Description |
-|------------------|--------|----------|-------------|
-| `id`             | string | **yes**  | Unique identifier |
-| `courseName`     | string | **yes**  | Short course code, e.g. `"CS 301"` |
-| `name`           | string | **yes**  | Assignment title |
-| `dueDate`        | string | **yes**  | ISO 8601 datetime |
-| `status`         | string | **yes**  | One of: `"upcoming"`, `"submitted"`, `"late"`, `"missing"`, `"graded"` |
-| `pointsEarned`   | number | no       | Points scored (only relevant when `status` is `"graded"`) |
-| `pointsPossible` | number | no       | Total points available |
+| Field          | Type   | Required | Description |
+|----------------|--------|----------|-------------|
+| `currentGPA`   | number | **yes**  | Cumulative GPA (0.0–4.0) |
+| `totalCredits` | number | **yes**  | Total credits earned |
+| `semesters`    | array  | **yes**  | Array of semester GPA objects for the bar chart |
+| `courses`      | array  | **yes**  | Array of currently enrolled courses |
+
+**Semester object:**
+
+| Field     | Type   | Required | Description |
+|-----------|--------|----------|-------------|
+| `term`    | string | **yes**  | Short label, e.g. `"Fall '24"` |
+| `gpa`     | number | **yes**  | Semester GPA (0.0–4.0) |
+| `credits` | number | **yes**  | Credits taken that semester |
+
+**Course object:**
+
+| Field          | Type   | Required | Description |
+|----------------|--------|----------|-------------|
+| `courseId`      | string | **yes**  | Course code, e.g. `"CS 301"` |
+| `name`         | string | **yes**  | Full course name |
+| `grade`        | string | no       | Current letter grade if available, e.g. `"A-"`. Shows "—" if omitted. |
+| `missingCount` | number | **yes**  | Number of missing assignments. `0` = no badge shown; `>0` = red badge. |
 
 ---
 
@@ -231,44 +242,7 @@ Default size: 600 × 380
 
 ---
 
-### 5. `"gpa"` — GPA Tracker with Bar Chart
-
-Default size: 320 × 280
-
-```json
-{
-  "type": "widget",
-  "widget_type": "gpa",
-  "data": {
-    "currentGPA": 3.67,
-    "totalCredits": 72,
-    "semesters": [
-      { "term": "Fall '24", "gpa": 3.4, "credits": 15 },
-      { "term": "Spr '25", "gpa": 3.6, "credits": 16 },
-      { "term": "Fall '25", "gpa": 3.8, "credits": 17 },
-      { "term": "Spr '26", "gpa": 3.9, "credits": 12 }
-    ]
-  }
-}
-```
-
-| Field          | Type   | Required | Description |
-|----------------|--------|----------|-------------|
-| `currentGPA`   | number | **yes**  | Cumulative GPA (0.0–4.0) |
-| `totalCredits` | number | **yes**  | Total credits earned |
-| `semesters`    | array  | **yes**  | Array of semester objects |
-
-**Semester object:**
-
-| Field     | Type   | Required | Description |
-|-----------|--------|----------|-------------|
-| `term`    | string | **yes**  | Short label, e.g. `"Fall '24"` |
-| `gpa`     | number | **yes**  | Semester GPA (0.0–4.0) |
-| `credits` | number | **yes**  | Credits taken that semester |
-
----
-
-### 6. `"job-listings"` — Job/Internship Results
+### 5. `"job-listings"` — Job/Internship Results
 
 Default size: 400 × 400
 
@@ -317,7 +291,7 @@ Default size: 400 × 400
 
 ---
 
-### 7. `"schedule"` — Weekly Class Timetable
+### 6. `"schedule"` — Weekly Class Timetable
 
 Default size: 540 × 400
 
@@ -385,9 +359,10 @@ Widget selection and formatting is implemented in `pipeline.py` with three metho
 | `lookup_professor` | `firstName` + `lastName` | `name` |
 | `lookup_professor` | `avgRating` | `rating` |
 | `lookup_professor` | `avgDifficulty` | `difficulty` |
-| `get_canvas_courses` | `course_code` | `courseName` |
-| `get_canvas_courses` | `course_name` | `name` |
-| `get_canvas_courses` | `current_score` | `pointsEarned` |
+| `get_canvas_courses` | `course_code` | `courses[].courseId` |
+| `get_canvas_courses` | `course_name` | `courses[].name` |
+| `get_canvas_courses` | `current_score` | `courses[].grade` (convert number to letter) |
+| `get_canvas_courses` | missing assignments count | `courses[].missingCount` |
 
 ### `_execute_tool(function_call)` — runs the tool and sends `tool_call` + `tool_result` messages
 
@@ -423,12 +398,11 @@ If the same tool is called multiple times (e.g., two job searches), the last res
 
 ## Quick Reference: Widget Types
 
-| `widget_type`     | What it shows                    | Key data field          |
-|-------------------|----------------------------------|-------------------------|
-| `"assignments"`   | Upcoming/past assignment list    | `assignments[]`         |
-| `"course-details"`| Single course info card          | flat object             |
-| `"professor"`     | Professor rating & contact       | flat object             |
-| `"course-roadmap"`| Prerequisite DAG visualization   | `major` + `nodes[]`    |
-| `"gpa"`           | GPA bar chart + current GPA      | `currentGPA` + `semesters[]` |
-| `"job-listings"`  | Job/internship search results    | `query` + `listings[]`  |
-| `"schedule"`      | Weekly class timetable grid      | `courses[]`             |
+| `widget_type`          | What it shows                              | Key data fields                              |
+|------------------------|--------------------------------------------|----------------------------------------------|
+| `"academic-overview"`  | GPA trend + current courses + missing work | `currentGPA`, `semesters[]`, `courses[]`     |
+| `"course-details"`     | Single course info card                    | flat object                                  |
+| `"professor"`          | Professor rating & contact                 | flat object                                  |
+| `"course-roadmap"`     | Prerequisite DAG visualization             | `major` + `nodes[]`                          |
+| `"job-listings"`       | Job/internship search results              | `query` + `listings[]`                       |
+| `"schedule"`           | Weekly class timetable grid                | `courses[]`                                  |

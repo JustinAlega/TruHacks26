@@ -1,9 +1,8 @@
 import type {
-  AssignmentData,
+  AcademicOverviewData,
   CourseData,
   ProfessorData,
   CourseRoadmapData,
-  GPAData,
   JobListingData,
   ScheduleData,
   WidgetType,
@@ -11,14 +10,20 @@ import type {
   Size,
 } from './types';
 
-export const assignmentsExample: AssignmentData = {
-  assignments: [
-    { id: '1', courseName: 'CS 301', name: 'Binary Tree Implementation', dueDate: '2026-03-25T23:59:00Z', status: 'upcoming', pointsPossible: 100 },
-    { id: '2', courseName: 'MATH 240', name: 'Eigenvalue Problem Set #5', dueDate: '2026-03-24T23:59:00Z', status: 'upcoming', pointsPossible: 50 },
-    { id: '3', courseName: 'CS 350', name: 'Sprint 3 Deliverable', dueDate: '2026-04-01T23:59:00Z', status: 'upcoming', pointsPossible: 200 },
-    { id: '4', courseName: 'CS 301', name: 'AVL Tree Quiz', dueDate: '2026-03-18T23:59:00Z', status: 'graded', pointsEarned: 92, pointsPossible: 100 },
-    { id: '5', courseName: 'ENG 102', name: 'Research Paper Draft', dueDate: '2026-03-15T23:59:00Z', status: 'submitted', pointsPossible: 150 },
-    { id: '6', courseName: 'MATH 240', name: 'Midterm Exam', dueDate: '2026-03-10T23:59:00Z', status: 'graded', pointsEarned: 78, pointsPossible: 100 },
+export const academicOverviewExample: AcademicOverviewData = {
+  currentGPA: 3.67,
+  totalCredits: 72,
+  semesters: [
+    { term: "Fall '24", gpa: 3.4, credits: 15 },
+    { term: "Spr '25", gpa: 3.6, credits: 16 },
+    { term: "Fall '25", gpa: 3.8, credits: 17 },
+    { term: "Spr '26", gpa: 3.9, credits: 12 },
+  ],
+  courses: [
+    { courseId: 'CS 301', name: 'Data Structures & Algorithms', grade: 'A-', missingCount: 0 },
+    { courseId: 'MATH 240', name: 'Linear Algebra', grade: 'B+', missingCount: 1 },
+    { courseId: 'CS 350', name: 'Software Engineering', grade: 'A', missingCount: 0 },
+    { courseId: 'ENG 102', name: 'English Composition II', grade: 'B', missingCount: 2 },
   ],
 };
 
@@ -61,17 +66,6 @@ export const roadmapExample: CourseRoadmapData = {
   ],
 };
 
-export const gpaExample: GPAData = {
-  currentGPA: 3.67,
-  totalCredits: 72,
-  semesters: [
-    { term: "Fall '24", gpa: 3.4, credits: 15 },
-    { term: "Spr '25", gpa: 3.6, credits: 16 },
-    { term: "Fall '25", gpa: 3.8, credits: 17 },
-    { term: "Spr '26", gpa: 3.9, credits: 12 },
-  ],
-};
-
 export const jobsExample: JobListingData = {
   query: 'Software Engineering Intern',
   listings: [
@@ -100,45 +94,39 @@ export interface ExampleWidget {
 
 export const EXAMPLE_WIDGETS: ExampleWidget[] = [
   {
-    type: 'gpa',
-    data: gpaExample,
+    type: 'academic-overview',
+    data: academicOverviewExample,
     position: { x: 40, y: 40 },
-    size: { width: 320, height: 280 },
-  },
-  {
-    type: 'assignments',
-    data: assignmentsExample,
-    position: { x: 400, y: 30 },
-    size: { width: 400, height: 420 },
+    size: { width: 420, height: 460 },
   },
   {
     type: 'professor',
     data: professorExample,
-    position: { x: 840, y: 50 },
+    position: { x: 500, y: 30 },
     size: { width: 340, height: 380 },
   },
   {
     type: 'schedule',
     data: scheduleExample,
-    position: { x: 30, y: 360 },
+    position: { x: 880, y: 40 },
     size: { width: 540, height: 400 },
   },
   {
     type: 'course-roadmap',
     data: roadmapExample,
-    position: { x: 610, y: 470 },
+    position: { x: 40, y: 540 },
     size: { width: 620, height: 380 },
   },
   {
     type: 'course-details',
     data: courseExample,
-    position: { x: 30, y: 800 },
+    position: { x: 700, y: 470 },
     size: { width: 360, height: 300 },
   },
   {
     type: 'job-listings',
     data: jobsExample,
-    position: { x: 430, y: 890 },
+    position: { x: 700, y: 810 },
     size: { width: 400, height: 400 },
   },
 ];

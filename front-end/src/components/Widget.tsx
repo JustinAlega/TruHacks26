@@ -1,35 +1,31 @@
 import { useRef, useCallback, type PointerEvent, type ReactNode } from 'react';
 import type { WidgetInstance, Position } from '../types';
 import { WIDGET_TITLES } from '../types';
-import { AssignmentsWidget } from './widgets/AssignmentsWidget';
+import { AcademicOverviewWidget } from './widgets/AcademicOverviewWidget';
 import { CourseDetailsWidget } from './widgets/CourseDetailsWidget';
 import { ProfessorWidget } from './widgets/ProfessorWidget';
 import { CourseRoadmapWidget } from './widgets/CourseRoadmapWidget';
-import { GPAWidget } from './widgets/GPAWidget';
 import { JobListingsWidget } from './widgets/JobListingsWidget';
 import { ScheduleWidget } from './widgets/ScheduleWidget';
 import type {
-  AssignmentData,
+  AcademicOverviewData,
   CourseData,
   ProfessorData,
   CourseRoadmapData,
-  GPAData,
   JobListingData,
   ScheduleData,
 } from '../types';
 
 function WidgetContent({ type, data }: { type: string; data: unknown }): ReactNode {
   switch (type) {
-    case 'assignments':
-      return <AssignmentsWidget data={data as AssignmentData} />;
+    case 'academic-overview':
+      return <AcademicOverviewWidget data={data as AcademicOverviewData} />;
     case 'course-details':
       return <CourseDetailsWidget data={data as CourseData} />;
     case 'professor':
       return <ProfessorWidget data={data as ProfessorData} />;
     case 'course-roadmap':
       return <CourseRoadmapWidget data={data as CourseRoadmapData} />;
-    case 'gpa':
-      return <GPAWidget data={data as GPAData} />;
     case 'job-listings':
       return <JobListingsWidget data={data as JobListingData} />;
     case 'schedule':
