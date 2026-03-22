@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 from google import genai
 from google.genai import types
 
-from tools.gemini_tools import ALL_TOOLS, get_canvas_courses, lookup_professor, search_job_listings
+from tools.gemini_tools import ALL_TOOLS, get_canvas_courses, lookup_professor, search_job_listings, search_available_courses
 
 GEMINI_MODEL = "gemini-2.5-flash"
 
@@ -35,9 +35,10 @@ CRITICAL — TOOL CALLING:
 When the student mentions grades, courses, professors, or jobs you MUST call the \
 matching tool BEFORE you produce ANY text response. Do NOT generate a response first. \
 Call the tool, wait for the result, THEN respond.
-- Grades or courses → call get_canvas_courses
+- Grades or current courses → call get_canvas_courses
 - Professor → call lookup_professor
 - Jobs or internships → call search_job_listings
+- Available courses, course catalog, what classes to take, class search → call search_available_courses
 If you are unsure, call the tool anyway. NEVER guess or fabricate data.
 
 RESPONSE RULES:
@@ -53,6 +54,7 @@ TOOL_MAP = {
     "get_canvas_courses": get_canvas_courses,
     "lookup_professor": lookup_professor,
     "search_job_listings": search_job_listings,
+    "search_available_courses": search_available_courses,
 }
 
 # Sentence boundary pattern for chunking text to TTS

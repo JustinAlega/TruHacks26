@@ -7,6 +7,7 @@ type hints and docstrings.
 """
 
 from tools.canvas_scraper import get_courses, extract_grades, get_late_stats
+from tools.course_scraper import search_courses as _search_courses
 from tools.rmp_scraper import search_school, search_professor
 from tools.theirstack_scraper import search_jobs as _search_jobs, extract_fields
 import json
@@ -100,5 +101,22 @@ def search_job_listings(
     return [extract_fields(job) for job in jobs]
 
 
+def search_available_courses(
+    major: str | None = None,
+    level: int | None = None,
+) -> list[dict]:
+    """Search the university course catalog for available courses.
+
+    Args:
+        major: Department prefix to filter by (e.g. "CS", "MATH", "ACCT").
+        level: Course level as a multiple of 100 (e.g. 300 returns courses
+            numbered 300 through 399). Common levels: 100, 200, 300, 400, 500.
+
+    Returns a list of course objects with fields: course_code, name, section,
+    crn, time, professor, credits, description.
+    """
+    return _search_courses(major=major, level=level)
+
+
 # List of all tool functions for Gemini
-ALL_TOOLS = [get_canvas_courses, lookup_professor, search_job_listings, get_cs_degree_roadmap]
+ALL_TOOLS = [get_canvas_courses, lookup_professor, search_job_listings, get_cs_degree_roadmap, search_available_courses]
