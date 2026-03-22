@@ -33,6 +33,21 @@ npm run dev
 
 Requires `ELEVENLABS_API_KEY` and `GEMINI_API_KEY` in `backend/.env`.
 
-## Known Issues
+**Rebuild course embeddings** (only needed if `availablecourses.db` changes):
+```bash
+cd backend && uv run python tools/build_embeddings.py
+```
 
-- Tool calls (Canvas grades, Rate My Professor, job search) are not yet working end-to-end. The Gemini tool declarations and scraper wrappers are in place but need debugging.
+## Tools
+
+| Tool | Source | Purpose |
+|------|--------|---------|
+| `get_canvas_courses` | Canvas LMS API | Current courses, grades, late assignments |
+| `lookup_professor` | Rate My Professors GraphQL | Professor ratings and reviews |
+| `search_job_listings` | TheirStack API | Job/internship search |
+| `get_cs_degree_roadmap` | Local JSON | CS degree prerequisite roadmap |
+| `search_available_courses` | RAG (sentence-transformers + numpy) | Semantic course catalog search via natural language query |
+
+### Course Catalog RAG
+
+Instead of SQL filters, the course catalog uses vector embeddings for semantic search. All 1,138 courses are embedded with `all-MiniLM-L6-v2` (384-dim) and searched via cosine similarity at query time. Gemini passes a natural language query (e.g. "courses about machine learning") and gets back the most relevant courses as context for its response.

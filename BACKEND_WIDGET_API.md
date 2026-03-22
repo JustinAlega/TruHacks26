@@ -364,7 +364,42 @@ Renders a directed acyclic graph of the student's degree path. Nodes are grouped
 
 ---
 
-## Message Sequence for a Turn
+## Current Integration (pipeline.py)
+
+Widget selection and formatting is implemented in `pipeline.py` with three methods:
+
+### `_resolve_widget(tool_results_log)` — picks which result to display
+- No tool calls → `None`
+- All calls to the same tool → format the last result
+- Multiple distinct tools → asks Gemini to pick, then formats the chosen one
+
+### `_format_widget(tool_name, args, result)` — transforms scraper output to widget schema
+
+**Note:** `search_available_courses` is a context-only tool (RAG-based semantic search) — it has no widget mapping. Results are returned to Gemini as context for generating responses but are not displayed as a widget.
+
+**Field mappings from scraper output → widget schema:**
+
+| Tool | Scraper field | Widget field |
+|------|--------------|--------------|
+| `search_job_listings` | `role` | `title` |
+| `search_job_listings` | `salary_min` + `salary_max` | `salary` (formatted as `$X–$Y`) |
+| `search_job_listings` | `posted_date` | `postedDate` |
+| `lookup_professor` | `firstName` + `lastName` | `name` |
+| `lookup_professor` | `avgRating` | `rating` |
+| `lookup_professor` | `avgDifficulty` | `difficulty` |
+| `get_canvas_courses` | `course_code` | `courseName` |
+| `get_canvas_courses` | `course_name` | `name` |
+| `get_canvas_courses` | `current_score` | `pointsEarned` |
+
+### `_execute_tool(function_call)` — runs the tool and sends `tool_call` + `tool_result` messages
+
+Widget message is sent once after all tool rounds complete (at the end of `_stream_with_tools`), not inside `_execute_tool`.
+
+---
+
+## Timing & Ordering
+
+Actual message sequence for a single turn with one tool call:
 
 ```
 1.  backend → frontend:  { "type": "tool_call",   "name": "search_job_listings", "args": {...} }

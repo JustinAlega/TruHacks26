@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 from google import genai
 from google.genai import types
 
-from tools.gemini_tools import ALL_TOOLS, get_canvas_courses, lookup_professor, search_job_listings, search_available_courses
+from tools.gemini_tools import ALL_TOOLS, get_canvas_courses, lookup_professor, search_job_listings, get_cs_degree_roadmap, search_available_courses
 
 GEMINI_MODEL = "gemini-2.5-flash"
 
@@ -38,7 +38,7 @@ Call the tool, wait for the result, THEN respond.
 - Grades or current courses → call get_canvas_courses
 - Professor → call lookup_professor
 - Jobs or internships → call search_job_listings
-- Available courses, course catalog, what classes to take, class search → call search_available_courses
+- Available courses, course catalog, what classes to take, class search → call search_available_courses with a descriptive query
 If you are unsure, call the tool anyway. NEVER guess or fabricate data.
 
 RESPONSE RULES:
@@ -54,6 +54,7 @@ TOOL_MAP = {
     "get_canvas_courses": get_canvas_courses,
     "lookup_professor": lookup_professor,
     "search_job_listings": search_job_listings,
+    "get_cs_degree_roadmap": get_cs_degree_roadmap,
     "search_available_courses": search_available_courses,
 }
 
@@ -307,6 +308,13 @@ class VoicePipeline:
         self, tool_name: str, args: dict, result: dict
     ) -> dict | None:
         """Convert a tool result into a widget message matching the frontend schema."""
+        if tool_name == "get_cs_degree_roadmap":
+            return {
+                "type": "widget",
+                "widget_type": "course-roadmap",
+                "data": result
+            }
+            
         if tool_name == "search_job_listings":
             titles = args.get("titles") or []
             query = ", ".join(titles) if titles else "Job Search"

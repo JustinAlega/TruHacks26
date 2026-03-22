@@ -1,11 +1,10 @@
 """
-Integration tests for Gemini's tool calling with search_available_courses.
+Integration tests for Gemini's tool calling with RAG-based search_available_courses.
 
 Uses the real Gemini API to verify the model calls the right tool with
-correct arguments for various course catalog prompts. Tools and TTS are mocked.
+appropriate query strings. Tools and TTS are mocked.
 """
 
-import asyncio
 import json
 import logging
 import os
@@ -44,6 +43,16 @@ class FakeWS:
 
 FAKE_COURSES = [
     {
+        "course_code": "CS 480",
+        "name": "Artificial Intelligence",
+        "section": "01",
+        "crn": "6900",
+        "time": "MWF 10:30 am - 11:20 am",
+        "professor": "Chen-Yeou Yu",
+        "credits": "3.000",
+        "description": "Introduction to artificial intelligence concepts and techniques.",
+    },
+    {
         "course_code": "CS 310",
         "name": "Data Structures & Algorithms",
         "section": "01",
@@ -52,16 +61,6 @@ FAKE_COURSES = [
         "professor": "MD Nazmul Shahadat",
         "credits": "3.000",
         "description": "Study of abstract data types and algorithms.",
-    },
-    {
-        "course_code": "CS 315",
-        "name": "Internet Programming",
-        "section": "01",
-        "crn": "6898",
-        "time": "MWF 2:30 pm - 3:20 pm",
-        "professor": "Chen-Yeou Yu",
-        "credits": "3.000",
-        "description": "Programming for the World Wide Web.",
     },
 ]
 
@@ -77,14 +76,18 @@ def mock_tool_map():
     def fake_jobs(titles=None, technologies=None, limit=10):
         return []
 
-    def fake_courses(major=None, level=None):
+    def fake_courses(query):
         return FAKE_COURSES
+
+    def fake_roadmap():
+        return {}
 
     return {
         "get_canvas_courses": fake_canvas,
         "lookup_professor": fake_rmp,
         "search_job_listings": fake_jobs,
         "search_available_courses": fake_courses,
+        "get_cs_degree_roadmap": fake_roadmap,
     }
 
 
@@ -115,13 +118,13 @@ async def run_pipeline(user_text: str) -> FakeWS:
 class TestCourseToolCalling:
 
     @pytest.mark.asyncio
-    async def test_major_query_calls_tool(self, caplog):
-        """Asking about CS courses should call search_available_courses with major='CS'."""
+    async def test_semantic_query_calls_tool(self, caplog):
+        """Asking about database courses should call search_available_courses with a query string."""
         with caplog.at_level(logging.INFO):
-            logger.info("=== test_major_query_calls_tool ===")
-            logger.info("Prompt: 'What CS courses are available?'")
+            logger.info("=== test_semantic_query_calls_tool ===")
+            logger.info("Prompt: 'What courses teach databases?'")
 
-            ws = await run_pipeline("What CS courses are available?")
+            ws = await run_pipeline("What courses teach databases?")
 
             calls = ws.tool_calls()
             logger.info("Tool calls made: %d", len(calls))
@@ -132,18 +135,18 @@ class TestCourseToolCalling:
             assert len(course_calls) >= 1, f"Expected search_available_courses call, got: {[c['name'] for c in calls]}"
 
             args = course_calls[0].get("args", {})
-            logger.info("First course call args: %s", args)
-            assert args.get("major", "").upper() == "CS", f"Expected major='CS', got {args}"
-            logger.info("PASS: Model called search_available_courses with major=CS")
+            assert "query" in args, f"Expected 'query' parameter, got: {args}"
+            logger.info("Query passed to tool: '%s'", args["query"])
+            logger.info("PASS: Model called search_available_courses with query string")
 
     @pytest.mark.asyncio
-    async def test_level_query_calls_tool(self, caplog):
-        """Asking about 300-level courses should call with level=300."""
+    async def test_topic_query_calls_tool(self, caplog):
+        """Asking about AI courses should call the tool with a relevant query."""
         with caplog.at_level(logging.INFO):
-            logger.info("=== test_level_query_calls_tool ===")
-            logger.info("Prompt: 'Show me all 300 level courses'")
+            logger.info("=== test_topic_query_calls_tool ===")
+            logger.info("Prompt: 'I want to learn about artificial intelligence'")
 
-            ws = await run_pipeline("Show me all 300 level courses")
+            ws = await run_pipeline("I want to learn about artificial intelligence")
 
             calls = ws.tool_calls()
             logger.info("Tool calls made: %d", len(calls))
@@ -153,39 +156,16 @@ class TestCourseToolCalling:
             course_calls = [c for c in calls if c["name"] == "search_available_courses"]
             assert len(course_calls) >= 1, f"Expected search_available_courses call, got: {[c['name'] for c in calls]}"
 
-            args = course_calls[0].get("args", {})
-            logger.info("First course call args: %s", args)
-            assert args.get("level") == 300, f"Expected level=300, got {args}"
-            logger.info("PASS: Model called search_available_courses with level=300")
+            query = course_calls[0].get("args", {}).get("query", "")
+            logger.info("Query passed to tool: '%s'", query)
+            assert len(query) > 0, "Expected non-empty query string"
+            logger.info("PASS: Model called search_available_courses with relevant query")
 
     @pytest.mark.asyncio
-    async def test_combined_query_calls_tool(self, caplog):
-        """Asking about 200-level MATH should call with both major and level."""
-        with caplog.at_level(logging.INFO):
-            logger.info("=== test_combined_query_calls_tool ===")
-            logger.info("Prompt: 'What 200 level math courses can I take?'")
-
-            ws = await run_pipeline("What 200 level math courses can I take?")
-
-            calls = ws.tool_calls()
-            logger.info("Tool calls made: %d", len(calls))
-            for c in calls:
-                logger.info("  Tool: %s | Args: %s", c["name"], c.get("args", {}))
-
-            course_calls = [c for c in calls if c["name"] == "search_available_courses"]
-            assert len(course_calls) >= 1, f"Expected search_available_courses call, got: {[c['name'] for c in calls]}"
-
-            args = course_calls[0].get("args", {})
-            logger.info("First course call args: %s", args)
-            assert args.get("major", "").upper() == "MATH", f"Expected major='MATH', got {args}"
-            assert args.get("level") == 200, f"Expected level=200, got {args}"
-            logger.info("PASS: Model called search_available_courses with major=MATH, level=200")
-
-    @pytest.mark.asyncio
-    async def test_greeting_does_not_call_course_tool(self, caplog):
+    async def test_greeting_no_call(self, caplog):
         """A greeting should NOT trigger search_available_courses."""
         with caplog.at_level(logging.INFO):
-            logger.info("=== test_greeting_does_not_call_course_tool ===")
+            logger.info("=== test_greeting_no_call ===")
             logger.info("Prompt: 'Hey, how's it going?'")
 
             ws = await run_pipeline("Hey, how's it going?")
@@ -200,13 +180,33 @@ class TestCourseToolCalling:
             logger.info("PASS: Model correctly did NOT call search_available_courses")
 
     @pytest.mark.asyncio
+    async def test_professor_query_no_call(self, caplog):
+        """A professor query should call lookup_professor, not search_available_courses."""
+        with caplog.at_level(logging.INFO):
+            logger.info("=== test_professor_query_no_call ===")
+            logger.info("Prompt: 'What's the rating for Professor Smith at Truman State?'")
+
+            ws = await run_pipeline("What's the rating for Professor Smith at Truman State?")
+
+            calls = ws.tool_calls()
+            logger.info("Tool calls made: %d", len(calls))
+            for c in calls:
+                logger.info("  Tool: %s | Args: %s", c["name"], c.get("args", {}))
+
+            course_calls = [c for c in calls if c["name"] == "search_available_courses"]
+            prof_calls = [c for c in calls if c["name"] == "lookup_professor"]
+            assert len(course_calls) == 0, "Should not call course tool for professor query"
+            assert len(prof_calls) >= 1, f"Expected lookup_professor call, got: {[c['name'] for c in calls]}"
+            logger.info("PASS: Model called lookup_professor, not search_available_courses")
+
+    @pytest.mark.asyncio
     async def test_tool_result_forwarded(self, caplog):
         """Verify the tool result is sent back to the frontend."""
         with caplog.at_level(logging.INFO):
             logger.info("=== test_tool_result_forwarded ===")
-            logger.info("Prompt: 'What CS courses are available?'")
+            logger.info("Prompt: 'What courses teach databases?'")
 
-            ws = await run_pipeline("What CS courses are available?")
+            ws = await run_pipeline("What courses teach databases?")
 
             results = ws.tool_results()
             logger.info("Tool results sent to frontend: %d", len(results))
@@ -222,23 +222,3 @@ class TestCourseToolCalling:
                 logger.info("PASS: Tool result forwarded with %d courses", len(data["results"]))
             else:
                 logger.info("SKIP: Model did not call search_available_courses this run")
-
-    @pytest.mark.asyncio
-    async def test_professor_query_does_not_call_course_tool(self, caplog):
-        """A professor query should call lookup_professor, not search_available_courses."""
-        with caplog.at_level(logging.INFO):
-            logger.info("=== test_professor_query_does_not_call_course_tool ===")
-            logger.info("Prompt: 'What's the rating for Professor Smith at Truman State?'")
-
-            ws = await run_pipeline("What's the rating for Professor Smith at Truman State?")
-
-            calls = ws.tool_calls()
-            logger.info("Tool calls made: %d", len(calls))
-            for c in calls:
-                logger.info("  Tool: %s | Args: %s", c["name"], c.get("args", {}))
-
-            course_calls = [c for c in calls if c["name"] == "search_available_courses"]
-            prof_calls = [c for c in calls if c["name"] == "lookup_professor"]
-            assert len(course_calls) == 0, f"Should not call course tool for professor query"
-            assert len(prof_calls) >= 1, f"Expected lookup_professor call, got: {[c['name'] for c in calls]}"
-            logger.info("PASS: Model called lookup_professor, not search_available_courses")
