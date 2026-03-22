@@ -157,7 +157,7 @@
 
 .widget-dock {
   position: fixed;
-  bottom: 20px;
+  top: 12px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -230,7 +230,7 @@
 @keyframes dock-slide-up {
   from {
     opacity: 0;
-    transform: translateX(-50%) translateY(16px);
+    transform: translateX(-50%) translateY(-16px);
   }
   to {
     opacity: 1;
@@ -684,11 +684,116 @@
   gap: var(--sp-8);
 }
 
+.roadmap-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--sp-4);
+}
+
 .roadmap-title {
   font-family: var(--font-display);
   font-size: 0.8rem;
   font-weight: 600;
   color: var(--on-surface-variant);
+}
+
+.roadmap-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.roadmap-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--on-surface-variant);
+  background: rgba(148, 163, 184, 0.08);
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.roadmap-action-btn:hover {
+  background: rgba(147, 242, 242, 0.12);
+  color: var(--secondary-fixed);
+}
+
+.roadmap-action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.roadmap-fullscreen-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: roadmap-fs-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.roadmap-fullscreen-inner {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 32px;
+}
+
+.roadmap-fullscreen-inner .roadmap-header-row {
+  flex-shrink: 0;
+  margin-bottom: 12px;
+}
+
+.roadmap-fullscreen-inner .roadmap-title {
+  font-size: 1.1rem;
+}
+
+.roadmap-fullscreen-graph {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+.roadmap-fullscreen-graph .roadmap-content {
+  width: 100%;
+  height: 100%;
+}
+
+.roadmap-svg-fullscreen {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.roadmap-svg-fullscreen svg {
+  display: block;
+}
+
+.roadmap-fullscreen-inner .roadmap-legend {
+  flex-shrink: 0;
+  margin-top: 12px;
+}
+
+@keyframes roadmap-fs-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .roadmap-svg-container {
