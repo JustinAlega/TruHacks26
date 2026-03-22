@@ -1,0 +1,24 @@
+<svg width="1400" height="500" viewBox="0 0 1400 500" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#6ACBBB" flood-opacity="0.45"/>
+      <feDropShadow dx="0" dy="0" stdDeviation="10" flood-color="#52A89C" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+
+  <rect width="100%" height="100%" fill="#10121E"/>
+
+  <text
+    x="50%"
+    y="52%"
+    text-anchor="middle"
+    dominant-baseline="middle"
+    font-family="'Eurostile', 'Bank Gothic', 'Orbitron', sans-serif"
+    font-size="140"
+    font-weight="500"
+    letter-spacing="0.22em"
+    fill="#94FAEB"
+    filter="url(#glow)">
+    A.R.I.A.
+  </text>
+</svg>

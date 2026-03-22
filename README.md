@@ -1,109 +1,10 @@
+<p align="center">
+  <img src="assets/aria-banner.svg" alt="A.R.I.A." width="100%"/>
+</p>
+
 # A.R.I.A. — Academic Resource Intelligence Assistant
 
 A voice-first AI advisor that lets university students talk naturally to get live grades, professor ratings, degree plans, and job listings — all rendered as interactive widgets on a JARVIS-inspired HUD. One conversation replaces a dozen tabs.
-
-## Architecture
-
-```mermaid
-flowchart TB
-    subgraph Browser["Browser (React 19 + TypeScript)"]
-        Mic["🎙 Microphone"]
-        Scribe["ElevenLabs Scribe v2\n(Client-Side STT + VAD)"]
-        Orb["Voice Orb\n(SVG Arc-Reactor)"]
-        Widgets["Interactive Widgets\n(Glassmorphic HUD)"]
-        Audio["MediaSource API\n(MP3 Streaming)"]
-        Auth["Supabase Auth"]
-
-        Mic --> Scribe
-        Scribe --> Orb
-    end
-
-    subgraph Backend["FastAPI Backend (Python 3.12)"]
-        WS["WebSocket Handler"]
-
-        subgraph Pipeline["Voice Pipeline"]
-            Gemini["Gemini 2.5 Flash\n(Streaming + Tool Calling)"]
-            Loop["Multi-Round Tool Loop\n(up to 5 rounds)"]
-            Resolve["Widget Resolver"]
-
-            Gemini <--> Loop
-            Loop --> Resolve
-        end
-
-        subgraph Tools["Custom Tool Suite"]
-            Canvas["get_canvas_courses\n(Canvas LMS API)"]
-            RMP["lookup_professor\n(RMP GraphQL)"]
-            Jobs["search_job_listings\n(TheirStack API)"]
-            Roadmap["get_cs_degree_roadmap\n(JSON DAG + RAG)"]
-            RAG["search_available_courses\n(Semantic Search)"]
-        end
-
-        subgraph RAGPipeline["RAG Pipeline"]
-            Embeddings["Course Embeddings\n(1,138 × 384-dim)"]
-            Model["all-MiniLM-L6-v2"]
-            Cosine["Cosine Similarity\n(NumPy)"]
-
-            Model --> Cosine
-            Embeddings --> Cosine
-        end
-
-        WS --> Pipeline
-        Loop --> Tools
-        RAG --> RAGPipeline
-        Roadmap -.->|"elective search"| RAGPipeline
-    end
-
-    subgraph TTS["ElevenLabs TTS"]
-        TTSws["Flash v2.5 WebSocket\n(Voice: Alice)"]
-    end
-
-    Scribe -->|"transcript JSON"| WS
-    Gemini -->|"sentence chunks"| TTSws
-    TTSws -->|"base64 audio"| WS
-    WS -->|"audio chunks"| Audio
-    Resolve -->|"widget payload"| WS
-    WS -->|"widget JSON"| Widgets
-    Pipeline -->|"text chunks"| WS
-    WS -->|"streaming text"| Orb
-
-    style Browser fill:#0f172a,stroke:#22d3ee,color:#e2e8f0
-    style Backend fill:#1e1b4b,stroke:#818cf8,color:#e2e8f0
-    style Pipeline fill:#1e1b4b,stroke:#818cf8,color:#c7d2fe
-    style Tools fill:#1e1b4b,stroke:#818cf8,color:#c7d2fe
-    style RAGPipeline fill:#1e1b4b,stroke:#818cf8,color:#c7d2fe
-    style TTS fill:#1c1917,stroke:#f59e0b,color:#e2e8f0
-```
-
-### WebSocket Message Protocol
-
-All communication is multiplexed over a single persistent WebSocket:
-
-```mermaid
-sequenceDiagram
-    participant B as Browser
-    participant S as FastAPI
-    participant G as Gemini 2.5 Flash
-    participant T as ElevenLabs TTS
-
-    B->>S: {"type": "transcript", "text": "..."}
-    S->>G: conversation history + tools
-
-    loop Tool Calling (up to 5 rounds)
-        G-->>S: tool_call (e.g. search_available_courses)
-        S->>S: execute tool
-        S-->>B: {"type": "tool_call", ...}
-        S-->>B: {"type": "tool_result", ...}
-        S->>G: tool result → continue generation
-    end
-
-    G-->>S: streamed text response
-    S-->>B: {"type": "text", "data": "..."}
-    S->>T: sentence chunks
-    T-->>S: base64 MP3 audio
-    S-->>B: {"type": "audio", "data": "<base64>"}
-    S-->>B: {"type": "widget", "widget_type": "...", "data": {...}}
-    S-->>B: {"type": "done"}
-```
 
 ## What A.R.I.A. Does
 
@@ -208,3 +109,114 @@ uv run python tools/build_embeddings.py
 | **SQLite** | Course catalog database (1,138 courses) |
 | **MediaSource Extensions** | Seamless client-side MP3 streaming |
 | **html2canvas + jsPDF** | Degree roadmap PDF export |
+
+## Architecture Diagrams
+
+<details>
+<summary>System Architecture (click to expand)</summary>
+
+```mermaid
+flowchart TB
+    subgraph Browser["Browser (React 19 + TypeScript)"]
+        Mic["🎙 Microphone"]
+        Scribe["ElevenLabs Scribe v2\n(Client-Side STT + VAD)"]
+        Orb["Voice Orb\n(SVG Arc-Reactor)"]
+        Widgets["Interactive Widgets\n(Glassmorphic HUD)"]
+        Audio["MediaSource API\n(MP3 Streaming)"]
+        Auth["Supabase Auth"]
+
+        Mic --> Scribe
+        Scribe --> Orb
+    end
+
+    subgraph Backend["FastAPI Backend (Python 3.12)"]
+        WS["WebSocket Handler"]
+
+        subgraph Pipeline["Voice Pipeline"]
+            Gemini["Gemini 2.5 Flash\n(Streaming + Tool Calling)"]
+            Loop["Multi-Round Tool Loop\n(up to 5 rounds)"]
+            Resolve["Widget Resolver"]
+
+            Gemini <--> Loop
+            Loop --> Resolve
+        end
+
+        subgraph Tools["Custom Tool Suite"]
+            Canvas["get_canvas_courses\n(Canvas LMS API)"]
+            RMP["lookup_professor\n(RMP GraphQL)"]
+            Jobs["search_job_listings\n(TheirStack API)"]
+            Roadmap["get_cs_degree_roadmap\n(JSON DAG + RAG)"]
+            RAG["search_available_courses\n(Semantic Search)"]
+        end
+
+        subgraph RAGPipeline["RAG Pipeline"]
+            Embeddings["Course Embeddings\n(1,138 × 384-dim)"]
+            Model["all-MiniLM-L6-v2"]
+            Cosine["Cosine Similarity\n(NumPy)"]
+
+            Model --> Cosine
+            Embeddings --> Cosine
+        end
+
+        WS --> Pipeline
+        Loop --> Tools
+        RAG --> RAGPipeline
+        Roadmap -.->|"elective search"| RAGPipeline
+    end
+
+    subgraph TTS["ElevenLabs TTS"]
+        TTSws["Flash v2.5 WebSocket\n(Voice: Alice)"]
+    end
+
+    Scribe -->|"transcript JSON"| WS
+    Gemini -->|"sentence chunks"| TTSws
+    TTSws -->|"base64 audio"| WS
+    WS -->|"audio chunks"| Audio
+    Resolve -->|"widget payload"| WS
+    WS -->|"widget JSON"| Widgets
+    Pipeline -->|"text chunks"| WS
+    WS -->|"streaming text"| Orb
+
+    style Browser fill:#0f172a,stroke:#22d3ee,color:#e2e8f0
+    style Backend fill:#1e1b4b,stroke:#818cf8,color:#e2e8f0
+    style Pipeline fill:#1e1b4b,stroke:#818cf8,color:#c7d2fe
+    style Tools fill:#1e1b4b,stroke:#818cf8,color:#c7d2fe
+    style RAGPipeline fill:#1e1b4b,stroke:#818cf8,color:#c7d2fe
+    style TTS fill:#1c1917,stroke:#f59e0b,color:#e2e8f0
+```
+
+</details>
+
+<details>
+<summary>WebSocket Message Protocol (click to expand)</summary>
+
+All communication is multiplexed over a single persistent WebSocket:
+
+```mermaid
+sequenceDiagram
+    participant B as Browser
+    participant S as FastAPI
+    participant G as Gemini 2.5 Flash
+    participant T as ElevenLabs TTS
+
+    B->>S: {"type": "transcript", "text": "..."}
+    S->>G: conversation history + tools
+
+    loop Tool Calling (up to 5 rounds)
+        G-->>S: tool_call (e.g. search_available_courses)
+        S->>S: execute tool
+        S-->>B: {"type": "tool_call", ...}
+        S-->>B: {"type": "tool_result", ...}
+        S->>G: tool result → continue generation
+    end
+
+    G-->>S: streamed text response
+    S-->>B: {"type": "text", "data": "..."}
+    S->>T: sentence chunks
+    T-->>S: base64 MP3 audio
+    S-->>B: {"type": "audio", "data": "<base64>"}
+    S-->>B: {"type": "widget", "widget_type": "...", "data": {...}}
+    S-->>B: {"type": "done"}
+```
+
+</details>
