@@ -78,9 +78,6 @@
   transition: height 0.2s ease;
 }
 
-.widget-frame.minimized {
-  height: auto !important;
-}
 
 .widget-accent-line {
   height: 2px;
@@ -151,6 +148,93 @@
   to {
     opacity: 1;
     transform: scale(1) translateY(0);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Widget Dock — Bottom tray for minimized widgets
+   ═══════════════════════════════════════════════════════════ */
+
+.widget-dock {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  padding: 6px 12px;
+  background: rgba(15, 23, 42, 0.82);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(148, 163, 184, 0.06);
+  z-index: 8500;
+  animation: dock-slide-up 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.dock-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px 6px 10px;
+  background: rgba(148, 163, 184, 0.06);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  position: relative;
+  white-space: nowrap;
+}
+
+.dock-item:hover {
+  background: rgba(148, 163, 184, 0.14);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.dock-item:active {
+  transform: translateY(0);
+}
+
+.dock-accent {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dock-label {
+  font-family: var(--font-display);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--on-surface-variant);
+}
+
+.dock-close {
+  font-size: 0.85rem;
+  line-height: 1;
+  color: var(--on-surface-dim);
+  margin-left: 2px;
+  padding: 0 2px;
+  border-radius: 4px;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.dock-close:hover {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.15);
+}
+
+@keyframes dock-slide-up {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
   }
 }
 

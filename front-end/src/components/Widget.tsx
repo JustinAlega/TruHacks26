@@ -91,7 +91,7 @@ export function Widget({
 
   return (
     <div
-      className={`widget-frame ${widget.minimized ? 'minimized' : ''}`}
+      className="widget-frame"
       style={{
         left: widget.position.x,
         top: widget.position.y,
@@ -109,7 +109,7 @@ export function Widget({
         onPointerUp={handlePointerUp}
       >
         <span className="widget-title">{title}</span>
-        <div className="widget-controls">
+        <div className="widget-controls" onPointerDown={(e) => e.stopPropagation()}>
           <button
             className="widget-ctrl-btn minimize"
             onClick={(e) => { e.stopPropagation(); onMinimize(widget.id); }}
@@ -132,11 +132,9 @@ export function Widget({
         </div>
       </div>
 
-      {!widget.minimized && (
-        <div className="widget-body">
-          <WidgetContent type={widget.type} data={widget.data} />
-        </div>
-      )}
+      <div className="widget-body">
+        <WidgetContent type={widget.type} data={widget.data} />
+      </div>
     </div>
   );
 }

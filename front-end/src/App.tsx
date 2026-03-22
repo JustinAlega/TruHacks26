@@ -3,6 +3,7 @@ import { useScribe, CommitStrategy } from '@elevenlabs/react';
 import { StreamingAudioPlayer } from './audioPlayer';
 import { useWidgetManager } from './hooks/useWidgetManager';
 import { Widget } from './components/Widget';
+import { WidgetDock } from './components/WidgetDock';
 import { VoiceOrb } from './components/VoiceOrb';
 import { TranscriptPanel } from './components/TranscriptPanel';
 import { EXAMPLE_WIDGETS } from './exampleData';
@@ -178,6 +179,9 @@ function App() {
     }
   }, [scribe]);
 
+  const visibleWidgets = widgets.filter((w) => !w.minimized);
+  const minimizedWidgets = widgets.filter((w) => w.minimized);
+
   return (
     <div className="hud-canvas">
       <div className="canvas-grid" />
@@ -188,7 +192,7 @@ function App() {
       </header>
 
       <div className="widget-layer">
-        {widgets.map((w) => (
+        {visibleWidgets.map((w) => (
           <Widget
             key={w.id}
             widget={w}
@@ -199,6 +203,12 @@ function App() {
           />
         ))}
       </div>
+
+      <WidgetDock
+        minimizedWidgets={minimizedWidgets}
+        onRestore={toggleMinimize}
+        onClose={removeWidget}
+      />
 
       <VoiceOrb
         isListening={isListening}
