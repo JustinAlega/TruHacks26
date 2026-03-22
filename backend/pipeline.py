@@ -38,7 +38,7 @@ Call the tool, wait for the result, THEN respond.
 - Grades or current courses → call get_canvas_courses
 - Professor → call lookup_professor
 - Jobs or internships → call search_job_listings
-- Available courses, course catalog, what classes to take, class search → call search_available_courses
+- Available courses, course catalog, what classes to take, class search → call search_available_courses with a descriptive query
 If you are unsure, call the tool anyway. NEVER guess or fabricate data.
 
 RESPONSE RULES:

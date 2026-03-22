@@ -375,6 +375,8 @@ Widget selection and formatting is implemented in `pipeline.py` with three metho
 
 ### `_format_widget(tool_name, args, result)` — transforms scraper output to widget schema
 
+**Note:** `search_available_courses` is a context-only tool (RAG-based semantic search) — it has no widget mapping. Results are returned to Gemini as context for generating responses but are not displayed as a widget.
+
 **Field mappings from scraper output → widget schema:**
 
 | Tool | Scraper field | Widget field |

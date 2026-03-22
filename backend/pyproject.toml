@@ -12,6 +12,8 @@ dependencies = [
     "elevenlabs>=1.50",
     "python-dotenv>=1",
     "requests>=2.32",
+    "sentence-transformers>=3.0",
+    "numpy>=1.26",
 ]
 
 [dependency-groups]
