@@ -145,7 +145,8 @@
       "credits": 3,
       "status": "in_progress",
       "prereqs": [
-        "CS181"
+        "CS181",
+        "CS191"
       ],
       "semester": 4
     },
@@ -190,9 +191,7 @@
       "name": "CS Elective",
       "credits": 3,
       "status": "wildcard",
-      "prereqs": [
-        "CS260"
-      ],
+      "prereqs": [],
       "semester": 5
     },
     {
@@ -224,9 +223,7 @@
       "name": "CS Elective",
       "credits": 3,
       "status": "wildcard",
-      "prereqs": [
-        "CS310"
-      ],
+      "prereqs": [],
       "semester": 6
     },
     {
@@ -258,9 +255,7 @@
       "name": "Senior CS Sem",
       "credits": 1,
       "status": "planned",
-      "prereqs": [
-        "CSELEC1"
-      ],
+      "prereqs": [],
       "semester": 7
     },
     {
@@ -316,6 +311,14 @@
       "name": "Dialogues Course",
       "credits": 3,
       "status": "planned",
+      "prereqs": [],
+      "semester": 8
+    },
+    {
+      "id": "ELEC4",
+      "name": "Free Elective",
+      "credits": 3,
+      "status": "wildcard",
       "prereqs": [],
       "semester": 8
     }
