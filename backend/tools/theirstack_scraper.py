@@ -91,6 +91,7 @@ def search_jobs(
         "limit": limit,
         "page": page,
         "posted_at_max_age_days": posted_at_max_age_days,
+        "job_country_code_or": ["US"],
     }
 
     if titles:
