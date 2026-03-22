@@ -24,6 +24,16 @@
   z-index: 0;
 }
 
+.login-grid::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 40% 40% at 50% 50%, rgba(147, 242, 242, 0.04) 0%, transparent 70%),
+    radial-gradient(ellipse at 50% 50%, transparent 30%, rgba(5, 8, 16, 0.65) 100%);
+}
+
 .login-card {
   position: relative;
   z-index: 1;
@@ -50,25 +60,26 @@
 
 .login-title {
   font-family: var(--font-display);
-  font-size: 2rem;
+  font-size: 2.2rem;
   font-weight: 800;
-  letter-spacing: -0.02em;
+  letter-spacing: 0.2em;
   background: linear-gradient(135deg, var(--secondary-fixed), var(--secondary-fixed-dim));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   margin: 0;
+  filter: drop-shadow(0 0 12px rgba(147, 242, 242, 0.15));
 }
 
 .login-subtitle {
   font-family: var(--font-body);
-  font-size: 0.72rem;
-  font-weight: 400;
-  letter-spacing: 0.15em;
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--on-surface-dim);
   display: block;
-  margin-top: 4px;
+  margin-top: 6px;
 }
 
 .login-form {
@@ -188,12 +199,14 @@
 }
 
 .auth-spinner {
-  width: 32px;
-  height: 32px;
-  border: 3px solid rgba(147, 242, 242, 0.15);
+  width: 40px;
+  height: 40px;
+  border: 2px solid rgba(147, 242, 242, 0.1);
   border-top-color: var(--secondary-fixed);
+  border-right-color: var(--secondary-fixed-dim);
   border-radius: 50%;
-  animation: spin 0.7s linear infinite;
+  animation: spin 0.8s linear infinite;
+  box-shadow: 0 0 20px rgba(147, 242, 242, 0.1);
 }
 
 @keyframes spin {
@@ -223,6 +236,17 @@
   z-index: 0;
 }
 
+/* JARVIS-style vignette + center glow */
+.canvas-grid::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 50% 60% at 50% 90%, rgba(147, 242, 242, 0.03) 0%, transparent 70%),
+    radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(5, 8, 16, 0.6) 100%);
+}
+
 /* ═══ HUD Header ═══ */
 
 .hud-header {
@@ -238,23 +262,25 @@
   font-family: var(--font-display);
   font-size: 1.5rem;
   font-weight: 800;
-  letter-spacing: -0.02em;
+  letter-spacing: 0.18em;
   background: linear-gradient(135deg, var(--secondary-fixed), var(--secondary-fixed-dim));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   margin: 0;
+  text-shadow: 0 0 30px rgba(147, 242, 242, 0.15);
+  filter: drop-shadow(0 0 8px rgba(147, 242, 242, 0.1));
 }
 
 .hud-subtitle {
   font-family: var(--font-body);
-  font-size: 0.7rem;
-  font-weight: 400;
-  letter-spacing: 0.15em;
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--on-surface-dim);
   display: block;
-  margin-top: 2px;
+  margin-top: 4px;
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -1360,7 +1386,7 @@
 }
 
 /* ═══════════════════════════════════════════════════════════
-   Voice Orb
+   Voice Orb — A.R.I.A. Arc-Reactor HUD
    ═══════════════════════════════════════════════════════════ */
 
 .voice-orb-container {
@@ -1376,118 +1402,77 @@
 }
 
 .orb-transcript-preview {
-  background: rgba(15, 23, 42, 0.8);
+  background: rgba(15, 23, 42, 0.85);
   backdrop-filter: blur(12px);
-  padding: var(--sp-6) var(--sp-12);
+  -webkit-backdrop-filter: blur(12px);
+  padding: var(--sp-6) var(--sp-16);
   border-radius: 999px;
   font-size: 0.75rem;
-  color: var(--on-surface-variant);
-  max-width: 300px;
+  color: var(--secondary-fixed);
+  max-width: 340px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   animation: fade-in 0.2s ease;
+  border: 1px solid rgba(147, 242, 242, 0.08);
 }
 
+/* ── Button wrapper ── */
+
 .voice-orb {
-  width: 64px;
-  height: 64px;
+  width: 128px;
+  height: 128px;
   border-radius: 50%;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
-  transition: transform 0.2s ease;
+  cursor: pointer;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .voice-orb:hover {
-  transform: scale(1.06);
+  transform: scale(1.05);
 }
 
-.voice-orb.inactive {
-  cursor: pointer;
-}
+/* ── SVG arc layer ── */
 
-.orb-core {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, var(--secondary-fixed), var(--secondary));
-  z-index: 2;
-  position: relative;
-}
-
-.orb-ring {
+.orb-arcs {
   position: absolute;
-  border-radius: 50%;
-  border: 1px solid rgba(147, 242, 242, 0.15);
+  inset: 0;
   pointer-events: none;
 }
 
-.ring-1 {
-  width: 52px;
-  height: 52px;
+.orb-glow-circle {
+  transition: opacity 0.4s ease;
 }
 
-.ring-2 {
-  width: 62px;
-  height: 62px;
-  opacity: 0.5;
+/* ── Core (center sphere) ── */
+
+.orb-core {
+  position: relative;
+  z-index: 2;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.ring-3 {
-  width: 72px;
-  height: 72px;
-  opacity: 0.25;
+.orb-core-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 38%, var(--secondary-fixed), var(--secondary));
+  box-shadow:
+    0 0 16px rgba(147, 242, 242, 0.3),
+    inset 0 0 8px rgba(255, 255, 255, 0.1);
+  transition: box-shadow 0.4s ease, background 0.4s ease;
 }
 
-/* Listening state — pulsing rings */
-.voice-orb.listening .orb-core {
-  box-shadow: 0 0 24px rgba(147, 242, 242, 0.35);
-}
-
-.voice-orb.listening .ring-1 {
-  animation: ring-pulse 2s ease-in-out infinite;
-}
-
-.voice-orb.listening .ring-2 {
-  animation: ring-pulse 2s ease-in-out infinite 0.3s;
-}
-
-.voice-orb.listening .ring-3 {
-  animation: ring-pulse 2s ease-in-out infinite 0.6s;
-}
-
-/* Processing state — spinning glow */
-.voice-orb.processing .orb-core {
-  box-shadow: 0 0 32px rgba(147, 242, 242, 0.5);
-  animation: orb-glow-pulse 1s ease-in-out infinite;
-}
-
-.voice-orb.processing .ring-1 {
-  animation: ring-spin 3s linear infinite;
-  border-style: dashed;
-}
-
-.voice-orb.processing .ring-2 {
-  animation: ring-spin 4s linear infinite reverse;
-  border-style: dashed;
-}
-
-/* Idle state */
-.voice-orb.idle .orb-core {
-  box-shadow: 0 0 12px rgba(147, 242, 242, 0.15);
-}
-
-/* Inactive (not started) */
-.voice-orb.inactive .orb-core {
-  background: radial-gradient(circle at 35% 35%, var(--on-surface-dim), var(--surface-container-high));
-}
-
-.voice-orb.inactive:hover .orb-core {
-  background: radial-gradient(circle at 35% 35%, var(--secondary-fixed-dim), var(--secondary));
-}
+/* ── Status bar ── */
 
 .orb-status {
   display: flex;
@@ -1503,47 +1488,211 @@
 
 .orb-dot.connected {
   background: #4ade80;
-  box-shadow: 0 0 6px rgba(74, 222, 128, 0.4);
+  box-shadow: 0 0 6px rgba(74, 222, 128, 0.5);
 }
 
 .orb-dot.disconnected {
   background: #ef4444;
+  box-shadow: 0 0 6px rgba(239, 68, 68, 0.4);
 }
 
 .orb-status-text {
   font-size: 0.68rem;
+  font-weight: 500;
   color: var(--on-surface-dim);
-  letter-spacing: 0.04em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
-@keyframes ring-pulse {
+/* ═══ Arc ring rotation — base (idle) ═══ */
+
+.arc-ring-1 { animation: arc-spin-cw 14s linear infinite; }
+.arc-ring-2 { animation: arc-spin-ccw 18s linear infinite; }
+.arc-ring-3 { animation: arc-spin-cw 22s linear infinite; }
+.arc-ring-4 { animation: arc-spin-ccw 30s linear infinite; }
+
+.arc-ticks { animation: arc-spin-ccw 60s linear infinite; }
+
+/* ═══ IDLE — gentle breathing ═══ */
+
+.voice-orb.idle .orb-core-inner {
+  animation: core-breathe 4s ease-in-out infinite;
+}
+
+.voice-orb.idle .orb-glow-circle {
+  animation: glow-breathe 4s ease-in-out infinite;
+}
+
+/* ═══ LISTENING — Siri-like energetic pulse ═══ */
+
+.voice-orb.listening .orb-core-inner {
+  box-shadow:
+    0 0 24px rgba(147, 242, 242, 0.5),
+    0 0 48px rgba(147, 242, 242, 0.15),
+    inset 0 0 12px rgba(255, 255, 255, 0.15);
+  animation: core-listen-pulse 1.5s ease-in-out infinite;
+}
+
+.voice-orb.listening .arc-ring-1 { animation: arc-spin-cw 6s linear infinite; }
+.voice-orb.listening .arc-ring-2 { animation: arc-spin-ccw 8s linear infinite; }
+.voice-orb.listening .arc-ring-3 { animation: arc-spin-cw 5s linear infinite, arc-listen-throb 1.5s ease-in-out infinite; }
+.voice-orb.listening .arc-ring-4 { animation: arc-spin-ccw 10s linear infinite; }
+
+.voice-orb.listening .orb-glow-circle {
+  animation: glow-listen 1.5s ease-in-out infinite;
+}
+
+/* ═══ PROCESSING — JARVIS overdrive ═══ */
+
+.voice-orb.processing .orb-core-inner {
+  box-shadow:
+    0 0 32px rgba(147, 242, 242, 0.6),
+    0 0 64px rgba(147, 242, 242, 0.2),
+    0 0 96px rgba(109, 213, 213, 0.08),
+    inset 0 0 16px rgba(255, 255, 255, 0.2);
+  animation: core-process 0.8s ease-in-out infinite;
+}
+
+.voice-orb.processing .arc-ring-1 { animation: arc-spin-cw 2s linear infinite; }
+.voice-orb.processing .arc-ring-2 { animation: arc-spin-ccw 2.5s linear infinite; }
+.voice-orb.processing .arc-ring-3 { animation: arc-spin-cw 1.8s linear infinite; }
+.voice-orb.processing .arc-ring-4 { animation: arc-spin-ccw 3s linear infinite; }
+
+.voice-orb.processing .arc-ticks {
+  animation: arc-spin-ccw 4s linear infinite;
+  opacity: 0.3;
+}
+
+.voice-orb.processing .orb-glow-circle {
+  animation: glow-process 0.8s ease-in-out infinite;
+}
+
+/* ═══ INACTIVE — dim, awaiting activation ═══ */
+
+.voice-orb.inactive .orb-core-inner {
+  background: radial-gradient(circle at 38% 38%, var(--on-surface-dim), var(--surface-container-high));
+  box-shadow: 0 0 6px rgba(147, 242, 242, 0.05);
+}
+
+.voice-orb.inactive .orb-arcs {
+  opacity: 0.3;
+}
+
+.voice-orb.inactive .arc-ring-1 { animation: arc-spin-cw 40s linear infinite; }
+.voice-orb.inactive .arc-ring-2 { animation: arc-spin-ccw 50s linear infinite; }
+.voice-orb.inactive .arc-ring-3 { animation: arc-spin-cw 60s linear infinite; }
+.voice-orb.inactive .arc-ring-4 { animation: arc-spin-ccw 70s linear infinite; }
+
+.voice-orb.inactive:hover .orb-core-inner {
+  background: radial-gradient(circle at 38% 38%, var(--secondary-fixed-dim), var(--secondary));
+  box-shadow: 0 0 20px rgba(147, 242, 242, 0.25);
+}
+
+.voice-orb.inactive:hover .orb-arcs {
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+/* ═══ Keyframes ═══ */
+
+@keyframes arc-spin-cw {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes arc-spin-ccw {
+  from { transform: rotate(360deg); }
+  to   { transform: rotate(0deg); }
+}
+
+@keyframes core-breathe {
+  0%, 100% { box-shadow: 0 0 16px rgba(147, 242, 242, 0.3), inset 0 0 8px rgba(255,255,255,0.1); }
+  50%      { box-shadow: 0 0 24px rgba(147, 242, 242, 0.45), inset 0 0 10px rgba(255,255,255,0.15); }
+}
+
+@keyframes glow-breathe {
+  0%, 100% { opacity: 0.5; }
+  50%      { opacity: 0.8; }
+}
+
+@keyframes core-listen-pulse {
   0%, 100% {
     transform: scale(1);
-    opacity: 0.4;
+    box-shadow: 0 0 24px rgba(147,242,242,0.5), 0 0 48px rgba(147,242,242,0.15), inset 0 0 12px rgba(255,255,255,0.15);
   }
   50% {
-    transform: scale(1.15);
-    opacity: 0.1;
+    transform: scale(1.12);
+    box-shadow: 0 0 32px rgba(147,242,242,0.65), 0 0 64px rgba(147,242,242,0.25), inset 0 0 16px rgba(255,255,255,0.2);
   }
 }
 
-@keyframes ring-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+@keyframes arc-listen-throb {
+  0%, 100% { opacity: 0.35; }
+  50%      { opacity: 0.7; }
 }
 
-@keyframes orb-glow-pulse {
+@keyframes glow-listen {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50%      { opacity: 1; transform: scale(1.08); }
+}
+
+@keyframes core-process {
   0%, 100% {
-    box-shadow: 0 0 24px rgba(147, 242, 242, 0.3);
+    transform: scale(1);
+    box-shadow: 0 0 32px rgba(147,242,242,0.6), 0 0 64px rgba(147,242,242,0.2), 0 0 96px rgba(109,213,213,0.08), inset 0 0 16px rgba(255,255,255,0.2);
   }
   50% {
-    box-shadow: 0 0 40px rgba(147, 242, 242, 0.55);
+    transform: scale(1.08);
+    box-shadow: 0 0 48px rgba(147,242,242,0.8), 0 0 80px rgba(147,242,242,0.3), 0 0 120px rgba(109,213,213,0.12), inset 0 0 20px rgba(255,255,255,0.25);
   }
+}
+
+@keyframes glow-process {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50%      { opacity: 1; transform: scale(1.15); }
 }
 
 @keyframes fade-in {
   from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Logout Button — bottom-right corner
+   ═══════════════════════════════════════════════════════════ */
+
+.logout-btn {
+  position: fixed;
+  bottom: var(--sp-16);
+  right: var(--sp-16);
+  z-index: 9500;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-6);
+  padding: var(--sp-6) var(--sp-12);
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--on-surface-dim);
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(148, 163, 184, 0.08);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.logout-btn:hover {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+}
+
+.logout-btn:active {
+  transform: scale(0.97);
 }
 
 /* ═══════════════════════════════════════════════════════════
