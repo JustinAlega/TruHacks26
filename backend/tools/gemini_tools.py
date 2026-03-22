@@ -9,7 +9,6 @@ type hints and docstrings.
 from tools.canvas_scraper import get_courses, extract_grades, get_late_stats
 from tools.course_scraper import search_courses as _search_courses
 from tools.rmp_scraper import search_school, search_professor
-from tools.course_scraper import search_courses as _search_courses
 from tools.theirstack_scraper import search_jobs as _search_jobs, extract_fields
 import json
 import os
@@ -96,7 +95,7 @@ def lookup_professor(professor_name: str) -> dict:
     """
     school = search_school("Truman State University")
     if not school:
-        return {"error": f"School not found: {school_name}"}
+        return {"error": "School not found: Truman State University"}
 
     prof = search_professor(professor_name, school["id"])
     if not prof:

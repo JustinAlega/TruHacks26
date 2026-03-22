@@ -8,24 +8,11 @@ import { WidgetDock } from './components/WidgetDock';
 import { VoiceOrb } from './components/VoiceOrb';
 import { TranscriptPanel } from './components/TranscriptPanel';
 import { LoginScreen } from './components/LoginScreen';
-import { EXAMPLE_WIDGETS } from './exampleData';
-import type { Message, WidgetType, WidgetInstance, Position, Size } from './types';
+import type { Message, WidgetType, Position, Size } from './types';
 import { WIDGET_DEFAULT_SIZES } from './types';
 import './App.css';
 
 const WS_URL = `ws://${window.location.host}/ws`;
-
-function buildInitialWidgets(): WidgetInstance[] {
-  return EXAMPLE_WIDGETS.map((ew, i) => ({
-    id: `example-${i}`,
-    type: ew.type,
-    data: ew.data,
-    position: ew.position,
-    size: ew.size,
-    zIndex: i + 1,
-    minimized: false,
-  }));
-}
 
 declare global {
   interface Window {

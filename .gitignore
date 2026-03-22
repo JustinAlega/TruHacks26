@@ -1,4 +1,7 @@
 CLAUDE.md
 .env
 __pycache__/
+*.pyc
+node_modules/
+*.db
 plans/*

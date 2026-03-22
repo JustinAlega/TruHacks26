@@ -4,6 +4,7 @@ import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import type { CourseRoadmapData, RoadmapNode, ElectiveOption } from '../../types';
 
+// Visual palette keyed by node completion status (used for both fill & stroke)
 const STATUS_COLORS: Record<string, { fill: string; stroke: string; text: string }> = {
   completed:   { fill: 'rgba(0, 106, 106, 0.35)', stroke: '#93f2f2', text: '#93f2f2' },
   in_progress: { fill: 'rgba(0, 106, 106, 0.15)', stroke: '#006a6a', text: '#6dd5d5' },
@@ -19,6 +20,12 @@ const ROW_GAP = 20;
 const PAD_X = 20;
 const PAD_Y = 40;
 
+/**
+ * Topological depth computation for the prerequisite DAG.
+ * Each node's depth = 1 + max(depths of its prerequisites).
+ * Nodes with no prerequisites sit at depth 0 (semester 1).
+ * The result drives which column a course is placed in.
+ */
 function computeLayers(nodes: RoadmapNode[]): Map<string, number> {
   const depth = new Map<string, number>();
   const nodeMap = new Map(nodes.map((n) => [n.id, n]));
@@ -106,6 +113,7 @@ export function CourseRoadmapWidget({ data }: { data: CourseRoadmapData }) {
     });
   }, []);
 
+  // Replace wildcard placeholders with the user's chosen elective details
   const resolvedNodes = data.nodes.map((node): RoadmapNode => {
     const sel = selections[node.id];
     if (node.status === 'wildcard' && sel) {
@@ -116,6 +124,7 @@ export function CourseRoadmapWidget({ data }: { data: CourseRoadmapData }) {
 
   const layers = computeLayers(resolvedNodes);
 
+  // Bucket nodes into 8 semester columns (prefer explicit semester, fallback to DAG depth)
   const columns: RoadmapNode[][] = Array.from({ length: 8 }, () => []);
   resolvedNodes.forEach((n) => {
     // Use n.semester if available (1-indexed), otherwise fallback to layers
@@ -131,6 +140,7 @@ export function CourseRoadmapWidget({ data }: { data: CourseRoadmapData }) {
   const svgW = PAD_X * 2 + numCols * NODE_W + (numCols - 1) * COL_GAP;
   const svgH = PAD_Y * 2 + maxRows * NODE_H + (maxRows - 1) * ROW_GAP;
 
+  // Calculate the (cx, cy) center of each node, vertically centered within its column
   const positions = new Map<string, { cx: number; cy: number }>();
   columns.forEach((col, ci) => {
     const colHeight = col.length * NODE_H + (col.length - 1) * ROW_GAP;
@@ -198,6 +208,7 @@ export function CourseRoadmapWidget({ data }: { data: CourseRoadmapData }) {
           viewBox={`0 0 ${svgW} ${svgH}`}
           preserveAspectRatio={isFullscreen ? 'xMidYMid meet' : undefined}
         >
+          {/* Prerequisite edges drawn as horizontal cubic Bézier curves */}
           {resolvedNodes.flatMap((node) =>
             node.prereqs.map((preId) => {
               const from = positions.get(preId);
@@ -346,6 +357,7 @@ export function CourseRoadmapWidget({ data }: { data: CourseRoadmapData }) {
         </svg>
       </div>
 
+      {/* Slide-in panel listing available electives when a wildcard node is tapped */}
       {activeNode && activeNode.electiveOptions && (
         <div className="elective-overlay">
           <div className="elective-overlay-header">

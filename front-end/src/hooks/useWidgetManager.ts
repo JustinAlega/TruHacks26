@@ -1,3 +1,9 @@
+/**
+ * useWidgetManager — manages the draggable widget instances on the HUD canvas.
+ *
+ * New widgets are auto-placed using a 3×2 grid-zone algorithm so they tile
+ * evenly across the viewport without overlapping the VoiceOrb at the bottom.
+ */
 import { useState, useRef, useCallback } from 'react';
 import type { WidgetInstance, WidgetType, Position, Size } from '../types';
 import { WIDGET_DEFAULT_SIZES } from '../types';
@@ -7,7 +13,7 @@ function generateId(): string {
   return `widget-${Date.now()}-${++globalIdCounter}`;
 }
 
-// Grid-zone placement: 3 columns × 2 rows, cycling through zones
+// Grid-zone auto-placement: 3 columns × 2 rows, cycling through zones
 const ZONE_COLS = 3;
 const ZONE_ROWS = 2;
 const ZONE_COUNT = ZONE_COLS * ZONE_ROWS;
@@ -15,6 +21,7 @@ const ZONE_PADDING = 20;
 const ZONE_JITTER = 20;
 const VOICE_ORB_MARGIN = 150; // px from bottom to avoid VoiceOrb
 
+/** Pick a viewport position for the next widget by centering it in its assigned zone + jitter. */
 function getZonePosition(zoneIndex: number, widgetWidth: number, widgetHeight: number): Position {
   const vw = window.innerWidth;
   const vh = window.innerHeight;

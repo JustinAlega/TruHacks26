@@ -10,6 +10,11 @@ interface VoiceOrbProps {
   isReconnecting: boolean;
 }
 
+/**
+ * Build an SVG arc path between two angles on a circle.
+ * Uses the standard parametric circle equation and the SVG arc command
+ * (large-arc flag set when the sweep exceeds 180°).
+ */
 function arcPath(cx: number, cy: number, r: number, startDeg: number, endDeg: number) {
   const toRad = (d: number) => (d * Math.PI) / 180;
   const x1 = cx + r * Math.cos(toRad(startDeg));
@@ -28,6 +33,8 @@ interface ArcRing {
   opacity: number;
 }
 
+// Each ring orbits at a different radius with its own CSS rotation animation
+// (arc-ring-1 … arc-ring-4). Gaps between segments create the broken-ring look.
 const ARC_RINGS: ArcRing[] = [
   {
     radius: 38, width: 2.5, opacity: 0.7,
@@ -68,6 +75,7 @@ const ARC_RINGS: ArcRing[] = [
   },
 ];
 
+// SVG viewBox is 128×128; center point for all arcs and the core glow
 const CX = 64;
 const CY = 64;
 
@@ -80,6 +88,7 @@ export function VoiceOrb({
   partial,
   isReconnecting,
 }: VoiceOrbProps) {
+  // Map connection + activity state to a CSS class that drives the arc animations
   const stateClass = isReconnecting
     ? 'idle'
     : isProcessing
@@ -98,6 +107,7 @@ export function VoiceOrb({
         ? 'Listening...'
         : 'Standing by';
 
+  // Pre-render arc rings once — they animate via CSS, not React re-renders
   const arcElements = useMemo(
     () =>
       ARC_RINGS.map((ring) => (

@@ -1,3 +1,10 @@
+/**
+ * AuthContext — Supabase authentication provider.
+ *
+ * On mount, fetches the existing session (if any) and subscribes to
+ * auth-state changes so every component under <AuthProvider> can
+ * reactively access the current user, session, and a signOut helper.
+ */
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import type { User, Session } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';

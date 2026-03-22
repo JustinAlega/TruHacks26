@@ -75,6 +75,8 @@ class VoicePipeline:
         self.gemini = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
         self.history: list[types.Content] = []
 
+    # ── Main entry point per user utterance ────────────────────────────
+
     async def handle_message(self, text: str):
         """Process a user transcript: Gemini streaming -> TTS -> audio out."""
         logger.info("[STT→LLM] User said: %s", text)
@@ -101,6 +103,8 @@ class VoicePipeline:
                 await tts_receive_task
 
         await self.ws.send_json({"type": "done"})
+
+    # ── Multi-round tool-calling loop ──────────────────────────────────
 
     async def _stream_with_tools(self, tts_ws) -> str:
         """Stream Gemini, handling tool calls in a loop (supports chained tools)."""
@@ -166,6 +170,8 @@ class VoicePipeline:
 
         return accumulated_text
 
+    # ── Single Gemini streaming call ──────────────────────────────────
+
     async def _stream_one_round(self, tts_ws, config) -> tuple[str, object | None]:
         """Run one Gemini streaming call. Returns (text, function_call_or_None)."""
         full_text = ""
@@ -220,6 +226,8 @@ class VoicePipeline:
             await self._send_tts_text(tts_ws, text_buffer, flush=True)
 
         return full_text, pending_tool_call
+
+    # ── Tool execution ────────────────────────────────────────────────
 
     async def _execute_tool(self, function_call) -> dict:
         """Execute a Gemini function call and return the result."""
