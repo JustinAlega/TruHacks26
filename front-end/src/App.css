@@ -1506,6 +1506,15 @@
 
 /* ═══ Arc ring rotation — base (idle) ═══ */
 
+.arc-ring-1,
+.arc-ring-2,
+.arc-ring-3,
+.arc-ring-4,
+.arc-ticks,
+.orb-glow-circle {
+  transform-origin: 64px 64px;
+}
+
 .arc-ring-1 { animation: arc-spin-cw 14s linear infinite; }
 .arc-ring-2 { animation: arc-spin-ccw 18s linear infinite; }
 .arc-ring-3 { animation: arc-spin-cw 22s linear infinite; }

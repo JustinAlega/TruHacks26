@@ -7,6 +7,7 @@ interface VoiceOrbProps {
   wsConnected: boolean;
   onStartSession: () => void;
   partial: string;
+  isReconnecting: boolean;
 }
 
 function arcPath(cx: number, cy: number, r: number, startDeg: number, endDeg: number) {
